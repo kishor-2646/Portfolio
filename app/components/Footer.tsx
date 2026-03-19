@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Code2 } from 'lucide-react';
+import { BRAND, SOCIAL } from '../lib/data';
 
 const Footer: React.FC = () => (
   <footer className="py-16 px-4 border-t border-white/10 bg-black text-slate-400">
@@ -11,14 +12,14 @@ const Footer: React.FC = () => (
         <div className="bg-white/10 p-2 rounded-lg">
           <Code2 size={24} />
         </div>
-        DEVPORT_CORE_26
+        {BRAND.footerLogo}
       </div>
 
       {/* Copyright */}
       <p className="font-bold text-sm">
-        © 2026 Engineered with precision.{' '}
+        {BRAND.copyright}{' '}
         <span className="text-slate-600 mx-2">|</span>
-        Made by You.
+        {BRAND.madeBy}
       </p>
 
       {/* Links */}

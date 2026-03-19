@@ -5,6 +5,9 @@ export interface Project {
   description: string;
   tags: string[];
   isFeatured?: boolean;
+  github?: string;
+  live?: string;
+  image?: string;
 }
 
 export interface NavItem {
@@ -38,8 +41,14 @@ export interface FailureLog {
   year: string;
 }
 
+// Each skill has a name and a proficiency level (1–5)
+export interface Skill {
+  name: string;
+  level: number;
+}
+
 export interface SkillCategory {
   name: string;
   icon: React.ElementType;
-  skills: string[];
+  skills: Skill[];   // ← Skill objects, NOT plain strings
 }

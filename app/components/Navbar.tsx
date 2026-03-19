@@ -2,16 +2,19 @@
 
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Code2, Terminal, User, Cpu, Briefcase, History, MessageSquare, Menu, X } from 'lucide-react';
+import { Code2, Terminal, User, Cpu, Briefcase, History, MessageSquare, Menu, X, Trophy, BookOpen } from 'lucide-react';
+import { BRAND } from '../lib/data';
 import type { NavbarProps, NavItem } from '../types';
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'hero',     label: 'Home',     icon: <Terminal size={18} /> },
-  { id: 'about',    label: 'About',    icon: <User size={18} /> },
-  { id: 'skills',   label: 'Skills',   icon: <Cpu size={18} /> },
-  { id: 'projects', label: 'Projects', icon: <Briefcase size={18} /> },
-  { id: 'timeline', label: 'Timeline', icon: <History size={18} /> },
-  { id: 'contact',  label: 'Contact',  icon: <MessageSquare size={18} /> },
+  { id: 'hero',         label: 'Home',        icon: <Terminal size={18} />  },
+  { id: 'about',        label: 'About',       icon: <User size={18} />      },
+  { id: 'skills',       label: 'Skills',      icon: <Cpu size={18} />       },
+  { id: 'projects',     label: 'Projects',    icon: <Briefcase size={18} /> },
+  { id: 'achievements', label: 'Wins',        icon: <Trophy size={18} />    },
+  { id: 'blogs',        label: 'Blogs',       icon: <BookOpen size={18} />  },
+  { id: 'timeline',     label: 'Timeline',    icon: <History size={18} />   },
+  { id: 'contact',      label: 'Contact',     icon: <MessageSquare size={18} /> },
 ];
 
 const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
@@ -27,17 +30,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
             <div className="bg-white text-black p-1 rounded-lg">
               <Code2 size={24} />
             </div>
-            <span>DEVPORT.26</span>
+            {BRAND.navLogo}
           </div>
 
           {/* Desktop Nav */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-2">
+            <div className="ml-6 flex items-center space-x-1">
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  className={`px-3 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                     activeSection === item.id
                       ? 'text-white bg-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)] border border-white/20'
                       : 'text-slate-500 hover:text-white hover:bg-white/5'
@@ -51,10 +54,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
 
           {/* Mobile Hamburger */}
           <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-slate-300 hover:text-white p-2"
-            >
+            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-300 hover:text-white p-2">
               {isOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -72,14 +72,9 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
           >
             <div className="px-4 pt-4 pb-8 space-y-2">
               {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveSection(item.id);
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center gap-4 w-full px-4 py-4 text-lg font-bold text-slate-200 hover:text-white hover:bg-white/10 rounded-2xl transition-all"
-                >
+                <button key={item.id}
+                  onClick={() => { setActiveSection(item.id); setIsOpen(false); }}
+                  className="flex items-center gap-4 w-full px-4 py-4 text-lg font-bold text-slate-200 hover:text-white hover:bg-white/10 rounded-2xl transition-all">
                   {item.icon} {item.label}
                 </button>
               ))}
