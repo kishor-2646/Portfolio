@@ -296,60 +296,181 @@ const portfolioConfig = {
 
 
   // ┌──────────────────────────────────────────────────────────────────┐
-  //  PROJECTS  (the cards in the Projects section)
+  //  PROJECTS  (cards on the main page + full detail page per project)
   //
-  //  HOW TO ADD A PROJECT — copy this block inside the array:
-  //  {
-  //    title:       "Your Project Name",
-  //    description: "What it does and key impact.",
-  //    tags:        ["Flutter", "Firebase"],
-  //    github:      "https://github.com/yourhandle/repo",   // "" to hide
-  //    live:        "https://your-live-url.com",            // "" to hide
-  //    image:       "/projects/screenshot.png",             // "" for placeholder
-  //    isFeatured:  false,   // true → gets "Featured" badge
-  //  },
+  //  Each project has two parts:
   //
-  //  HOW TO REORDER: cut and paste blocks
-  //  HOW TO REMOVE:  delete the block
+  //  PART 1 — CARD (shown on the Projects section grid):
+  //    slug        → URL-friendly ID — e.g. "greenwave" → /project/greenwave
+  //                  Use only lowercase letters, numbers, hyphens. No spaces.
+  //    title       → project name shown on card
+  //    description → short summary shown on card (2–3 sentences)
+  //    tags        → tech stack chips on the card
+  //    github      → GitHub repo URL ("" to hide the button)
+  //    live        → Live demo URL ("" to hide the button)
+  //    image       → card thumbnail ("/projects/filename.png" or "" for placeholder)
+  //    isFeatured  → true = "Featured" badge on card
+  //
+  //  PART 2 — DETAIL PAGE (shown when user clicks the card):
+  //    details: {
+  //      overview   → full paragraph(s) describing the project
+  //      problem    → what problem it solves
+  //      solution   → how you solved it
+  //      impact     → real-world results / numbers
+  //      role       → your specific role in the project
+  //      duration   → how long it took
+  //      teamSize   → "Solo" | "2 members" | "12-member team"
+  //      status     → "Completed" | "In Progress" | "Hackathon MVP"
+  //      highlights → array of key feature bullets (shown as a list)
+  //      screenshots → array of image paths shown in a gallery
+  //                    (put files in /public/projects/)
+  //    }
+  //
+  //  HOW TO ADD A NEW PROJECT:
+  //    Copy a full block from below, paste it, fill in both parts.
   // └──────────────────────────────────────────────────────────────────┘
   projects: [
     {
+      // ── Card ──────────────────────────────────────────────
+      slug:        "greenwave",
       title:       "GreenWave — Smart Ambulance Traffic System",
-      description: "Real-time ambulance tracking and intelligent traffic signal automation system that creates green corridors in high-traffic zones. Integrates Firebase, live GPS, and automated signal control logic with manual override alerts. Winner — Best Innovative Idea, BFB 24-Hour Hackathon.",
+      description: "Real-time ambulance tracking and intelligent traffic signal automation system that creates green corridors in high-traffic zones. Winner — Best Innovative Idea, BFB 24-Hour Hackathon.",
       tags:        ["Flutter", "Firebase", "Google Maps API", "Dart", "FCM", "Real-Time"],
       github:      "https://github.com/kishor-2646/GreenWave",
       live:        "",
       image:       "/projects/greenwave.png",
       isFeatured:  true,
+
+      // ── Detail page ───────────────────────────────────────
+      details: {
+        overview:  "GreenWave is a real-time smart traffic management system designed to create green corridors for ambulances in high-traffic zones. It tracks ambulance GPS live and automatically controls traffic signals along the route — removing the need for manual intervention and reducing emergency response delays.",
+        problem:   "Heavy urban traffic delays ambulances by several critical minutes. Manual traffic control is inefficient, and non-automated junctions have no system to alert traffic police in real time.",
+        solution:  "Built a Flutter app with three separate dashboards (Admin, Ambulance Driver, Traffic Police). Firebase Realtime Database syncs GPS coordinates live. Signal control logic auto-triggers green lights on the ambulance route. FCM sends instant alerts to police at non-automated junctions.",
+        impact:    "Demonstrated reduction in emergency corridor delays during testing. Won Best Innovative Idea at the BFB 24-Hour Hackathon. Architecture supports multi-city deployment.",
+        role:      "Sole developer — designed the system architecture, built all three dashboards, integrated Firebase, Google Maps API, and FCM notifications end-to-end.",
+        duration:  "Built in 24 hours (hackathon), extended post-hackathon",
+        teamSize:  "Solo",
+        status:    "Hackathon Winner — Active Development",
+        highlights: [
+          "Live GPS ambulance tracking with sub-second Firebase sync",
+          "Automated traffic signal control along the ambulance route",
+          "Real-time FCM push alerts to traffic police at manual junctions",
+          "Three role-based dashboards: Admin, Driver, Police",
+          "Scalable architecture designed for multi-city deployment",
+          "Winner — Best Innovative Idea, BFB 24-Hour Hackathon",
+        ],
+        screenshots: [
+          "/projects/greenwave.png",
+          // Add more: "/projects/greenwave-2.png", "/projects/greenwave-3.png"
+        ],
+      },
     },
+
     {
+      // ── Card ──────────────────────────────────────────────
+      slug:        "truck-singh",
       title:       "Truck Singh — Logistics Management System",
-      description: "Full-stack logistics platform serving 100+ users (drivers, agents, owners), reducing manual coordination by ~40% through workflow automation. Features real-time chat, Google Maps live tracking, automated alerts, document verification, and invoice generation.",
+      description: "Full-stack logistics platform serving 100+ users across drivers, agents, and owners — reducing manual coordination by ~40% through end-to-end workflow automation.",
       tags:        ["Flutter", "Supabase", "Google Maps", "OneSignal", "Real-Time Chat"],
       github:      "https://github.com/kishor-2646",
       live:        "",
-      image:       "/projects/trucksingh.png",
+      image:       "",
       isFeatured:  true,
+
+      // ── Detail page ───────────────────────────────────────
+      details: {
+        overview:  "Truck Singh is a production-grade logistics management platform used by 100+ real users — drivers, agents, and owners. It eliminates manual coordination through automated workflows, real-time communication, and live vehicle tracking.",
+        problem:   "Logistics operations were handled through phone calls and WhatsApp — error-prone, slow, and untrackable. No real-time visibility on vehicle positions, no automated alerts, no digital paperwork.",
+        solution:  "Built a Flutter multi-role app backed by Supabase. Real-time chat using Supabase Realtime. Google Maps integration for live vehicle tracking and route optimisation. OneSignal for automated push alerts. Document verification and invoice generation built in.",
+        impact:    "~40% reduction in manual coordination overhead. 100+ active users across three roles. Zero-downtime production deployments during internship sprint.",
+        role:      "Flutter Developer (Intern at UptoSkills) — led the final sprint as Team Lead, built backend-integrated features, resolved critical performance bottlenecks, and deployed production updates.",
+        duration:  "Sep 2025 – Jan 2026 (Internship)",
+        teamSize:  "4-member team (led final sprint)",
+        status:    "Production — Active",
+        highlights: [
+          "Real-time chat system for drivers, agents, and owners",
+          "Google Maps live tracking and route optimisation",
+          "Automated OneSignal push notifications and alerts",
+          "Document verification and digital invoice generation",
+          "Scalable Supabase database schemas for real-time workflows",
+          "Led final-month sprint as Team Lead under tight deadlines",
+        ],
+        screenshots: [
+          // Add: "/projects/trucksingh-1.png", "/projects/trucksingh-2.png"
+        ],
+      },
     },
+
     {
+      // ── Card ──────────────────────────────────────────────
+      slug:        "pcify",
       title:       "PCify — AI-Based PC Builder Marketplace",
-      description: "Two-sided marketplace connecting users with PC builders, powered by an AI recommendation engine for personalised configurations. Features real-time chat, booking, payment system, trust layer with ratings and reviews, and a matching algorithm.",
+      description: "Two-sided marketplace connecting users with PC builders, powered by an AI recommendation engine for personalised configurations. Features real-time chat, booking, and a trust layer.",
       tags:        ["Flutter", "AI/ML", "Supabase", "Real-Time", "Marketplace"],
       github:      "https://github.com/kishor-2646",
       live:        "",
-      image:       "/projects/PCify.png",
+      image:       "",
       isFeatured:  false,
+
+      // ── Detail page ───────────────────────────────────────
+      details: {
+        overview:  "PCify is a two-sided marketplace that connects users who want a custom PC with expert PC builders. An AI recommendation engine suggests personalised configurations based on user budget and use case. The platform handles the full transaction: discovery, chat, booking, payment, and review.",
+        problem:   "Building a custom PC requires technical knowledge most users don't have. Existing solutions are fragmented — no single platform for finding trusted builders, getting personalised recommendations, and completing the transaction safely.",
+        solution:  "Building a Flutter app with Supabase backend. AI-powered matching algorithm pairs users with the best-fit builder. Real-time chat, booking calendar, and payment integration. Trust layer with ratings, reviews, and portfolio showcase for builders.",
+        impact:    "Currently in active development. Architecture designed to handle high concurrency with Supabase Realtime and optimised matching queries.",
+        role:      "Sole developer — full-stack architecture, AI recommendation engine design, UI/UX, backend.",
+        duration:  "2025 — ongoing",
+        teamSize:  "Solo",
+        status:    "In Progress",
+        highlights: [
+          "AI recommendation engine for personalised PC configurations",
+          "Two-sided marketplace: users and expert PC builders",
+          "Real-time chat and booking system",
+          "Integrated payment flow end-to-end",
+          "Trust layer with ratings, reviews, and builder portfolio showcase",
+          "Matching algorithm optimised for user-expert pairing efficiency",
+        ],
+        screenshots: [
+          // Add: "/projects/pcify-1.png", "/projects/pcify-2.png"
+        ],
+      },
     },
+
     {
-      title:       "Med Sakthi — Smart Healthcare & Safety Platform",
-      description: "Led a 12-member team to deliver a B2B medicine marketplace MVP in 15 days under hackathon constraints. Built authentication, bulk order system, and seamless B2B transaction flows — demonstrating strong execution under high-pressure deadlines.",
+      // ── Card ──────────────────────────────────────────────
+      slug:        "retailer-sakthi",
+      title:       "Retailer Sakthi — B2B Medicine Platform",
+      description: "Led a 12-member team to deliver a B2B medicine marketplace MVP in 15 days under hackathon constraints. Built auth, bulk ordering, and seamless B2B transaction flows.",
       tags:        ["Flutter", "Firebase", "Team Lead", "Hackathon", "B2B"],
       github:      "https://github.com/kishor-2646",
       live:        "",
-      image:       "/projects/MedSakthi.png",
+      image:       "",
       isFeatured:  false,
+
+      // ── Detail page ───────────────────────────────────────
+      details: {
+        overview:  "Retailer Sakthi is a B2B medicine distribution platform built under hackathon pressure. It enables pharmacies and medical retailers to place bulk orders directly from distributors — replacing manual phone-based ordering with a digital, verifiable workflow.",
+        problem:   "Medicine retailers relied on phone calls and paper records to place bulk orders with distributors — slow, error-prone, and completely untrackable.",
+        solution:  "Built a Flutter + Firebase MVP with role-based authentication for retailers and distributors. Bulk order system with catalogue browsing and quantity selection. Structured planning and sprint-based execution across a 12-member team in 15 days.",
+        impact:    "Delivered a working MVP in 15 days under hackathon constraints. Demonstrated strong team execution and leadership under pressure.",
+        role:      "Team Lead — managed a 12-member team, defined architecture, divided features across the team, and personally built authentication and the bulk order system.",
+        duration:  "15 days (Hackathon)",
+        teamSize:  "12-member team",
+        status:    "Hackathon MVP — Completed",
+        highlights: [
+          "Full B2B ordering workflow from catalogue to confirmation",
+          "Role-based authentication for retailers and distributors",
+          "Bulk order system with quantity management",
+          "Delivered complete MVP in 15 days with 12-member team",
+          "Demonstrated leadership under extreme deadline pressure",
+        ],
+        screenshots: [
+          // Add: "/projects/retailersakthi-1.png"
+        ],
+      },
     },
-    // ← Paste your next project here
+
+    // ← Paste your next project here (include slug + details block)
   ],
 
 

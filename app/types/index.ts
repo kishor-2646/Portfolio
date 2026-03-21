@@ -1,13 +1,28 @@
 import React from 'react';
 
+export interface ProjectDetails {
+  overview:    string;
+  problem:     string;
+  solution:    string;
+  impact:      string;
+  role:        string;
+  duration:    string;
+  teamSize:    string;
+  status:      string;
+  highlights:  string[];
+  screenshots: string[];
+}
+
 export interface Project {
-  title: string;
+  slug:        string;
+  title:       string;
   description: string;
-  tags: string[];
+  tags:        string[];
   isFeatured?: boolean;
-  github?: string;
-  live?: string;
-  image?: string;
+  github?:     string;
+  live?:       string;
+  image?:      string;
+  details?:    ProjectDetails;
 }
 
 export interface NavItem {

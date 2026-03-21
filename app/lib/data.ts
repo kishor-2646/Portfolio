@@ -27,7 +27,8 @@ const TIMELINE_ICON_MAP: Record<string, React.ElementType> = {
 
 // ── Derived exports ─────────────────────────────────────────
 
-export const PROJECTS: Project[] = portfolioConfig.projects.map((p) => ({
+export const PROJECTS: Project[] = portfolioConfig.projects.map((p: any) => ({
+  slug:        p.slug,
   title:       p.title,
   description: p.description,
   tags:        p.tags,
@@ -35,6 +36,7 @@ export const PROJECTS: Project[] = portfolioConfig.projects.map((p) => ({
   github:      p.github,
   live:        p.live,
   image:       p.image,
+  details:     p.details,
 }));
 
 export const FAILURE_LOGS: FailureLog[] = portfolioConfig.failureLogs.map((f) => ({

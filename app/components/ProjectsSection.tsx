@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import { Github, ExternalLink, Layers3, ChevronRight, Trophy, Star } from 'lucide-react';
 import { useHasMounted } from '../lib/hooks';
@@ -119,6 +120,7 @@ const ProjectThumbnail = ({
 const ProjectsSection: React.FC = () => {
   const hasMounted = useHasMounted();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const router = useRouter();
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -281,7 +283,8 @@ const ProjectsSection: React.FC = () => {
               transition={{ delay: i * 0.1 }}
               onHoverStart={() => setHoveredIdx(i)}
               onHoverEnd={() => setHoveredIdx(null)}
-              className="group relative bg-white/[0.04] backdrop-blur-3xl border border-white/10 rounded-[2rem] overflow-hidden hover:border-cyan-500/45 hover:shadow-[0_0_40px_rgba(34,211,238,0.09)] transition-all duration-150 flex flex-col"
+              className="group relative bg-white/[0.04] backdrop-blur-3xl border border-white/10 rounded-[2rem] overflow-hidden hover:border-cyan-500/45 hover:shadow-[0_0_40px_rgba(34,211,238,0.09)] transition-all duration-150 flex flex-col cursor-pointer"
+              onClick={() => router.push(`/project/${p.slug}`)}
             >
               {/* Top colour bar */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-500 via-blue-400 to-indigo-500 z-10" />
