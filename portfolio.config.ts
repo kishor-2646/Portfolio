@@ -39,7 +39,6 @@ const portfolioConfig = {
     ],
   },
 
-
   // ┌──────────────────────────────────────────────────────────────────┐
   //  IDENTITY
   //  Your name, role, headline shown in Hero + About sections.
@@ -372,9 +371,9 @@ const portfolioConfig = {
       title:       "Truck Singh — Logistics Management System",
       description: "Full-stack logistics platform serving 100+ users across drivers, agents, and owners — reducing manual coordination by ~40% through end-to-end workflow automation.",
       tags:        ["Flutter", "Supabase", "Google Maps", "OneSignal", "Real-Time Chat"],
-      github:      "https://github.com/kishor-2646",
+      github:      "",
       live:        "",
-      image:       "",
+      image:       "/projects/trucksingh.png",
       isFeatured:  true,
 
       // ── Detail page ───────────────────────────────────────
@@ -407,9 +406,9 @@ const portfolioConfig = {
       title:       "PCify — AI-Based PC Builder Marketplace",
       description: "Two-sided marketplace connecting users with PC builders, powered by an AI recommendation engine for personalised configurations. Features real-time chat, booking, and a trust layer.",
       tags:        ["Flutter", "AI/ML", "Supabase", "Real-Time", "Marketplace"],
-      github:      "https://github.com/kishor-2646",
+      github:      "",
       live:        "",
-      image:       "",
+      image:       "/projects/PCify.png",
       isFeatured:  false,
 
       // ── Detail page ───────────────────────────────────────
@@ -442,9 +441,9 @@ const portfolioConfig = {
       title:       "Retailer Sakthi — B2B Medicine Platform",
       description: "Led a 12-member team to deliver a B2B medicine marketplace MVP in 15 days under hackathon constraints. Built auth, bulk ordering, and seamless B2B transaction flows.",
       tags:        ["Flutter", "Firebase", "Team Lead", "Hackathon", "B2B"],
-      github:      "https://github.com/kishor-2646",
+      github:      "",
       live:        "",
-      image:       "",
+      image:       "/projects/MedSakthi.png",
       isFeatured:  false,
 
       // ── Detail page ───────────────────────────────────────

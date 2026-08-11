@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -9,7 +9,6 @@ import {
   TrendingUp, Code2, ImageIcon,
 } from 'lucide-react';
 import { PROJECTS } from '../../lib/data';
-import { useHasMounted } from '../../lib/hooks';
 
 // ── Accent colour per project index ─────────────────────────
 const ACCENTS = [
@@ -42,20 +41,11 @@ const Section = ({ icon: Icon, label, children, accent }: {
 export default function ProjectDetailPage() {
   const params   = useParams();
   const router   = useRouter();
-  const hasMounted = useHasMounted();
   const slug     = params?.slug as string;
 
   const project  = PROJECTS.find(p => p.slug === slug);
   const idx      = PROJECTS.findIndex(p => p.slug === slug);
   const accent   = ACCENTS[idx % ACCENTS.length];
-
-  // Background particles
-  const particles = useMemo(() => [...Array(16)].map((_, i) => ({
-    x: `${(i * 6.5) % 92}%`,
-    size: 3 + (i % 4) * 2,
-    duration: 6 + (i % 5) * 2,
-    delay: i * 0.5,
-  })), []);
 
   // 404 state
   if (!project) {
@@ -80,20 +70,10 @@ export default function ProjectDetailPage() {
 
       {/* ── Background ── */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 opacity-[0.05]"
+        <div className="absolute inset-0 opacity-[0.03]"
           style={{ backgroundImage: `radial-gradient(#ffffff 0.5px, transparent 0.5px)`, backgroundSize: '20px 20px' }} />
-        <div className={`absolute top-0 right-0 w-[600px] h-[600px] ${accent.bg} rounded-full blur-[160px] opacity-30`} />
-        <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] ${accent.bg} rounded-full blur-[120px] opacity-20`} />
-
-        {/* Floating particles */}
-        {hasMounted && particles.map((p, i) => (
-          <motion.div key={i}
-            className={`absolute rounded-full ${accent.bg} border ${accent.border}`}
-            style={{ width: p.size, height: p.size, left: p.x }}
-            animate={{ y: ['100vh', '-5vh'], opacity: [0, 0.6, 0.6, 0] }}
-            transition={{ duration: p.duration, repeat: Infinity, ease: 'linear', delay: p.delay }}
-          />
-        ))}
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] ${accent.bg} rounded-full blur-[160px] opacity-20`} />
+        <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] ${accent.bg} rounded-full blur-[120px] opacity-15`} />
       </div>
 
       {/* ── Top navbar ── */}

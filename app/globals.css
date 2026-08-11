@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:            #0A0A0A;
+  --surface:       #111111;
+  --accent:        #FF7E33;
+  --accent-hover:  #e86e28;
+  --text-primary:  #ffffff;
+  --text-secondary:#999999;
+  --border:        rgba(255,255,255,0.08);
+
+  /* Motion tokens (mirrors app/lib/motion.ts) */
+  --dur-micro:  0.18s;
+  --dur-fast:   0.22s;
+  --dur-normal: 0.35s;
+  --dur-reveal: 0.55s;
+  --ease-out:   cubic-bezier(0.22, 1.0, 0.36, 1.0);
+  --ease-inout: cubic-bezier(0.65, 0.0, 0.35, 1.0);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─────────────────────────────────────────────────────────
+   BASE
+───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  /* Smooth scrolling on Safari iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-outfit, 'Outfit'), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--accent); color: #fff; }
+
+/* ─────────────────────────────────────────────────────────
+   SCROLLBAR
+───────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+/* ─────────────────────────────────────────────────────────
+   PERFORMANCE — use GPU layers for animated elements
+───────────────────────────────────────────────────────── */
+[data-framer-motion-optimize] {
+  will-change: transform, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+   Disables all meaningful animations while preserving layout.
+   The site remains fully usable.
+───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Stop ALL CSS transitions and animations */
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
+
+  /* Force Framer Motion to skip animations */
+  [data-framer-motion-value],
+  [style*="transform"],
+  [style*="opacity"] {
+    transition: none !important;
+  }
 }
