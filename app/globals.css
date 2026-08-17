@@ -1,16 +1,23 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────
-   DESIGN TOKENS
+   DESIGN TOKENS — Cinematic Monochrome
 ───────────────────────────────────────────────────────── */
 :root {
-  --bg:            #0A0A0A;
-  --surface:       #111111;
-  --accent:        #FF7E33;
-  --accent-hover:  #e86e28;
-  --text-primary:  #ffffff;
-  --text-secondary:#999999;
-  --border:        rgba(255,255,255,0.08);
+  --bg:              #080808;
+  --surface:         #111111;
+  --surface-2:       #161616;
+
+  /* Neutral palette — no orange */
+  --text-primary:    #ffffff;
+  --text-secondary:  rgba(255,255,255,0.55);
+  --text-muted:      rgba(255,255,255,0.28);
+
+  --border:          rgba(255,255,255,0.08);
+  --border-subtle:   rgba(255,255,255,0.05);
+
+  /* Accent — kept minimal, only for scroll bar / selection */
+  --accent:          rgba(255,255,255,0.7);
 
   /* Motion tokens (mirrors app/lib/motion.ts) */
   --dur-micro:  0.18s;
@@ -28,7 +35,6 @@
 
 html {
   scroll-behavior: smooth;
-  /* Smooth scrolling on Safari iOS */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -41,17 +47,21 @@ body {
   overflow-x: hidden;
 }
 
-::selection { background: var(--accent); color: #fff; }
+::selection {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
 
 /* ─────────────────────────────────────────────────────────
-   SCROLLBAR
+   SCROLLBAR — minimal monochrome
 ───────────────────────────────────────────────────────── */
-::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: #0A0A0A; }
-::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+::-webkit-scrollbar       { width: 3px; }
+::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
 
 /* ─────────────────────────────────────────────────────────
-   PERFORMANCE — use GPU layers for animated elements
+   PERFORMANCE — GPU layers for animated elements
 ───────────────────────────────────────────────────────── */
 [data-framer-motion-optimize] {
   will-change: transform, opacity;
@@ -60,10 +70,8 @@ body {
 /* ─────────────────────────────────────────────────────────
    REDUCED MOTION
    Disables all meaningful animations while preserving layout.
-   The site remains fully usable.
 ───────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  /* Stop ALL CSS transitions and animations */
   *, *::before, *::after {
     animation-duration:        0.01ms !important;
     animation-iteration-count: 1      !important;
@@ -71,7 +79,6 @@ body {
     scroll-behavior:           auto   !important;
   }
 
-  /* Force Framer Motion to skip animations */
   [data-framer-motion-value],
   [style*="transform"],
   [style*="opacity"] {
