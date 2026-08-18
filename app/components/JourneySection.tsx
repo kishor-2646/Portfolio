@@ -43,12 +43,12 @@ const ScrollDrawLine = ({
     >
       {/* Track header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2.5 bg-orange-50 rounded-xl border border-[#FF7E33]/15">
+        <div className="p-2.5 bg-white/5 rounded-xl border border-white/8">
           <Icon size={18} className="text-[#FF7E33]" />
         </div>
         <div>
-          <h4 className="text-sm font-black text-slate-900">{path.title}</h4>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+          <h4 className="text-sm font-black text-white">{path.title}</h4>
+          <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">
             {path.timeline.length} milestones
           </p>
         </div>
@@ -58,7 +58,7 @@ const ScrollDrawLine = ({
       <div className="relative pl-6 space-y-6">
 
         {/* Track: full height background */}
-        <div className="absolute top-2 bottom-2 left-[7px] w-[2px] bg-slate-100 rounded-full overflow-hidden">
+        <div className="absolute top-2 bottom-2 left-[7px] w-[2px] bg-white/10 rounded-full overflow-hidden">
           {/* Drawn line — grows as user scrolls through */}
           <motion.div
             className="absolute top-0 left-0 w-full bg-gradient-to-b from-[#FF7E33] to-[#FFB36A] rounded-full"
@@ -77,19 +77,19 @@ const ScrollDrawLine = ({
           >
             {/* Dot — activates on scroll entry */}
             <motion.div
-              initial={{ scale: 0.5, backgroundColor: '#E2E8F0' }}
+              initial={{ scale: 0.5, backgroundColor: 'rgba(255,255,255,0.2)' }}
               whileInView={{ scale: 1, backgroundColor: '#FF7E33' }}
               viewport={{ once: true, margin: '-20px' }}
               transition={{ duration: dur.normal, delay: pIdx * 0.1 + eIdx * 0.12, ease: ease.spring }}
-              className="absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white shadow-sm"
+              className="absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-black shadow-sm"
             />
 
             <div>
               <span className="text-[10px] font-black text-[#FF7E33] uppercase tracking-wider">{event.date}</span>
-              <h5 className="text-sm font-bold text-slate-900 mt-0.5 group-hover:text-[#FF7E33] transition-colors duration-200">
+              <h5 className="text-sm font-bold text-white mt-0.5 group-hover:text-[#FF7E33] transition-colors duration-200">
                 {event.label}
               </h5>
-              <p className="text-xs text-slate-400 mt-0.5">{event.focus}</p>
+              <p className="text-xs text-white/50 mt-0.5">{event.focus}</p>
             </div>
           </motion.div>
         ))}
@@ -102,7 +102,11 @@ const sv = (d: number) => scrollReveal(d, 22);
 
 export default function JourneySection() {
   return (
-    <section id="journey" className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 bg-white text-slate-900 overflow-hidden">
+    <section
+      id="journey"
+      className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 text-white overflow-hidden"
+      style={{ background: '#000000' }}
+    >
       <div className="max-w-7xl mx-auto space-y-20 relative z-10">
 
         {/* ── Header ── */}
@@ -112,7 +116,7 @@ export default function JourneySection() {
               <div className="h-px w-12 bg-[#FF7E33]/50" />
               <span className="text-xs font-black text-[#FF7E33] uppercase tracking-[0.35em]">Journey</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
               Experience & <span className="text-[#FF7E33]">Growth</span>
             </h2>
             <div className="h-1 w-16 rounded-full bg-[#FF7E33]" />
@@ -131,8 +135,8 @@ export default function JourneySection() {
         {/* ── Achievements ── */}
         <div className="space-y-8">
           <motion.div {...sv(0.05)}>
-            <h3 className="text-2xl font-black text-slate-900">Achievements & Certifications</h3>
-            <p className="text-slate-500 text-sm mt-1">Hackathon wins, certifications, and professional milestones.</p>
+            <h3 className="text-2xl font-black text-white">Achievements & Certifications</h3>
+            <p className="text-white/50 text-sm mt-1">Hackathon wins, certifications, and professional milestones.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -142,19 +146,17 @@ export default function JourneySection() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
-                className="group p-6 border border-slate-200/80 rounded-2xl cursor-default"
-                style={{ background: '#fafafa' }}
+                className="group p-6 border border-white/8 rounded-2xl cursor-default"
+                style={{ background: 'rgba(255,255,255,0.025)' }}
                 whileHover={{
                   y: -3,
                   borderColor: 'rgba(255,126,51,0.3)',
-                  boxShadow: '0 12px 28px rgba(0,0,0,0.06)',
-                  background: '#fff',
+                  boxShadow: '0 12px 28px rgba(0,0,0,0.4)',
+                  background: 'rgba(255,255,255,0.04)',
                 }}
                 transition={{
-                  // entry reveal
                   opacity:    { duration: dur.reveal, delay: i * 0.07, ease: ease.out },
                   y:          { duration: dur.normal, ease: ease.out },
-                  // hover transitions
                   borderColor:{ duration: dur.normal },
                   boxShadow:  { duration: dur.normal },
                   background: { duration: dur.normal },
@@ -170,19 +172,19 @@ export default function JourneySection() {
                   </motion.span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-500">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[#FF7E33]">
                         {a.category}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-bold">{a.year}</span>
+                      <span className="text-[10px] text-white/40 font-bold">{a.year}</span>
                     </div>
-                    <h4 className="text-sm font-black text-slate-900 leading-snug group-hover:text-[#FF7E33] transition-colors duration-200">
+                    <h4 className="text-sm font-black text-white leading-snug group-hover:text-[#FF7E33] transition-colors duration-200">
                       {a.title}
                     </h4>
-                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                    <p className="text-xs text-white/50 mt-1 flex items-center gap-1.5">
                       <Award size={10} className="text-[#FF7E33]" />
                       {a.event}
                     </p>
-                    <p className="text-xs text-slate-500 mt-2 leading-relaxed">{a.highlight}</p>
+                    <p className="text-xs text-white/60 mt-2 leading-relaxed">{a.highlight}</p>
                   </div>
                 </div>
               </motion.div>
@@ -193,8 +195,8 @@ export default function JourneySection() {
         {/* ── Timeline ── */}
         <div className="space-y-8">
           <motion.div {...sv(0.1)}>
-            <h3 className="text-2xl font-black text-slate-900">Learning Timeline</h3>
-            <p className="text-slate-500 text-sm mt-1">How I've grown from fundamentals to production systems.</p>
+            <h3 className="text-2xl font-black text-white">Learning Timeline</h3>
+            <p className="text-white/50 text-sm mt-1">How I've grown from fundamentals to production systems.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

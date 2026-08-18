@@ -4,7 +4,7 @@
    DESIGN TOKENS — Cinematic Monochrome
 ───────────────────────────────────────────────────────── */
 :root {
-  --bg:              #080808;
+  --bg:              #000000;
   --surface:         #111111;
   --surface-2:       #161616;
 
@@ -26,6 +26,10 @@
   --dur-reveal: 0.55s;
   --ease-out:   cubic-bezier(0.22, 1.0, 0.36, 1.0);
   --ease-inout: cubic-bezier(0.65, 0.0, 0.35, 1.0);
+
+  /* Cursor spotlight position — updated by JS each frame */
+  --spotlight-x: 50%;
+  --spotlight-y: 50%;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -36,6 +40,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  /* Prevent horizontal scroll from parallax decorative elements */
+  overflow-x: hidden;
 }
 
 body {
@@ -56,7 +62,7 @@ body {
    SCROLLBAR — minimal monochrome
 ───────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 3px; }
-::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-track { background: #000000; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
 
@@ -65,6 +71,94 @@ body {
 ───────────────────────────────────────────────────────── */
 [data-framer-motion-optimize] {
   will-change: transform, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────
+   PROJECT CARD HOVER — smooth premium scale
+   Applied globally so the CSS transition backs up JS hover.
+───────────────────────────────────────────────────────── */
+.project-card {
+  transition:
+    transform    0.6s cubic-bezier(0.22, 1.0, 0.36, 1.0),
+    box-shadow   0.6s cubic-bezier(0.22, 1.0, 0.36, 1.0),
+    border-color 0.35s ease;
+}
+.project-card:hover {
+  transform: translateY(-4px) scale(1.015);
+}
+.project-card img {
+  transition: transform 0.65s cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+.project-card:hover img {
+  transform: scale(1.04);
+}
+
+/* ─────────────────────────────────────────────────────────
+   NAVIGATION HOVER — pill highlight
+───────────────────────────────────────────────────────── */
+.nav-item {
+  position: relative;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity  var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+.nav-item:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ─────────────────────────────────────────────────────────
+   ROTATING TAGLINE ANIMATIONS
+───────────────────────────────────────────────────────── */
+@keyframes enterChar {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes exitWord {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    filter: blur(4px);
+  }
+}
+
+.char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(8px);
+  animation: enterChar 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.exit-anim {
+  animation: exitWord 0.4s ease-in forwards;
+  transform-origin: center center;
+  will-change: transform, opacity, filter;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -83,5 +177,10 @@ body {
   [style*="transform"],
   [style*="opacity"] {
     transition: none !important;
+  }
+
+  /* Disable cursor spotlight on reduced-motion */
+  [data-spotlight] {
+    display: none !important;
   }
 }

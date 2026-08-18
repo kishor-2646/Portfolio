@@ -61,7 +61,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen antialiased font-sans" style={{ background: '#080808' }}>
+    <div className="min-h-screen antialiased font-sans" style={{ background: '#000000' }}>
       <ScrollProgressBar />
 
       {/* Floating pill navigation — replaces old full-width Navbar */}

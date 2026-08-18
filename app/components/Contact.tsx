@@ -9,7 +9,11 @@ import portfolioConfig from '../../portfolio.config';
 
 export default function Contact() {
   return (
-    <section id="contact" className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 bg-[#FAFAFA] text-slate-900 overflow-hidden">
+    <section
+      id="contact"
+      className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 text-white overflow-hidden"
+      style={{ background: '#000000' }}
+    >
       <div className="max-w-4xl mx-auto space-y-12 relative z-10">
 
         {/* Header */}
@@ -19,10 +23,10 @@ export default function Contact() {
             <span className="text-xs font-black text-[#FF7E33] uppercase tracking-[0.35em]">Contact</span>
             <div className="h-px w-12 bg-[#FF7E33]/50" />
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
             Let&apos;s work <span className="text-[#FF7E33]">together</span>
           </h2>
-          <p className="text-slate-600 text-base md:text-lg max-w-md mx-auto">
+          <p className="text-white/60 text-base md:text-lg max-w-md mx-auto">
             {portfolioConfig.contact.subheading}
           </p>
         </motion.div>
@@ -69,13 +73,17 @@ export default function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: dur.normal, delay: 0.16 + i * 0.06, ease: ease.out }}
-              className="flex items-center gap-3 p-4 bg-white border border-slate-200/80 shadow-sm rounded-xl"
-              whileHover={{ y: -2, boxShadow: '0 8px 20px rgba(0,0,0,0.06)', borderColor: 'rgba(255,126,51,0.25)' }}
+              className="flex items-center gap-3 p-4 rounded-xl cursor-default"
+              style={{
+                background: 'rgba(255,255,255,0.025)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+              whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', borderColor: 'rgba(255,126,51,0.3)' }}
             >
-              <div className="p-2 bg-orange-50 rounded-lg shrink-0">{icon}</div>
+              <div className="p-2 bg-white/5 rounded-lg border border-white/8 shrink-0">{icon}</div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{label}</p>
-                <p className="text-sm font-semibold text-slate-800">{value}</p>
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-wider">{label}</p>
+                <p className="text-sm font-semibold text-white/90">{value}</p>
               </div>
             </motion.div>
           ))}
@@ -90,7 +98,7 @@ export default function Contact() {
           ].map(({ href, icon, label }) => (
             <motion.a
               key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-              className="w-12 h-12 bg-white border border-slate-200 shadow-sm rounded-full flex items-center justify-center text-slate-500"
+              className="w-12 h-12 bg-white/5 border border-white/10 shadow-sm rounded-full flex items-center justify-center text-white/60"
               whileHover={{ backgroundColor: '#FF7E33', color: '#fff', borderColor: '#FF7E33', scale: 1.08 }}
               whileTap={{ scale: 0.94 }}
               transition={{ duration: dur.fast, ease: ease.out }}
@@ -100,8 +108,8 @@ export default function Contact() {
           ))}
           <motion.a
             href={RESUME_URL} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm"
-            whileHover={{ borderColor: 'rgba(255,126,51,0.5)', color: '#FF7E33', y: -2 }}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/15 text-white/70 font-semibold text-sm bg-white/5"
+            whileHover={{ borderColor: 'rgba(255,126,51,0.5)', color: '#FF7E33', y: -2, background: 'rgba(255,126,51,0.08)' }}
             whileTap={{ y: 0 }}
             transition={{ duration: dur.fast, ease: ease.out }}
           >
@@ -111,7 +119,7 @@ export default function Contact() {
 
         {/* Availability badge */}
         <motion.div {...scrollReveal(0.24)} className="text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF7E33]/8 border border-[#FF7E33]/20 rounded-full">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF7E33]/10 border border-[#FF7E33]/25 rounded-full">
             <span className="w-2 h-2 rounded-full bg-[#FF7E33] animate-pulse" />
             <span className="text-sm font-bold text-[#FF7E33]">Available for new opportunities</span>
           </div>

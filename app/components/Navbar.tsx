@@ -6,11 +6,11 @@ import { Menu, X } from 'lucide-react';
 import type { NavbarProps, NavItem } from '../types';
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'about',    label: 'About',        icon: <></> },
-  { id: 'skills',   label: 'Skills',       icon: <></> },
-  { id: 'projects', label: 'Projects',     icon: <></> },
-  { id: 'journey',  label: 'Journey',      icon: <></> },
-  { id: 'contact',  label: 'Contact',      icon: <></> },
+  { id: 'about',    label: 'About',    icon: <></> },
+  { id: 'skills',   label: 'Work',     icon: <></> },
+  { id: 'projects', label: 'Skills',   icon: <></> },
+  { id: 'journey',  label: 'Journey',  icon: <></> },
+  { id: 'contact',  label: 'Contact',  icon: <></> },
 ];
 
 /* Sections that render on a white/light background */
@@ -30,110 +30,158 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
 
   return (
     <nav
-      className="fixed top-0 left-0 w-full z-50 transition-all duration-300"
-      style={{
-        background: scrolled
-          ? (isLight ? 'rgba(255,255,255,0.92)' : 'rgba(15,15,17,0.85)')
-          : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled
-          ? (isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.06)')
-          : 'none',
-        boxShadow: scrolled && isLight ? '0 4px 20px rgba(0,0,0,0.06)' : 'none',
-      }}
+      className="fixed top-0 left-0 w-full z-50"
+      style={{ pointerEvents: 'none' }}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-20">
-        <div className="flex items-center justify-between h-20">
-
-          {/* ── Logo ── */}
+      {/* ── Single centered pill — logo + nav items + resume ── */}
+      <div
+        className="hidden md:flex items-center justify-center pt-5"
+        style={{ pointerEvents: 'none' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-1"
+          style={{
+            pointerEvents: 'auto',
+            background: scrolled
+              ? (isLight ? 'rgba(255,255,255,0.92)' : 'rgba(18,18,20,0.88)')
+              : (isLight ? 'rgba(255,255,255,0.85)' : 'rgba(18,18,20,0.72)'),
+            backdropFilter: 'blur(20px)',
+            border: isLight
+              ? '1px solid rgba(0,0,0,0.10)'
+              : '1px solid rgba(255,255,255,0.10)',
+            borderRadius: 999,
+            padding: '5px 5px',
+            gap: 2,
+            boxShadow: scrolled ? '0 8px 32px rgba(0,0,0,0.24)' : 'none',
+            transition: 'background 0.3s, box-shadow 0.3s',
+          }}
+        >
+          {/* Logo K pill — left inside the nav bar */}
           <button
             onClick={() => setActiveSection('hero')}
-            className="flex items-center gap-2.5 group shrink-0"
             aria-label="Scroll to top"
-          >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-lg transition-shadow duration-300"
-              style={{
-                background: 'linear-gradient(135deg,#FF7A1A,#FF9B52)',
-                boxShadow: '0 0 20px rgba(255,122,26,0.45)',
-              }}
-            >
-              K
-            </div>
-            <span className={`text-xl font-black tracking-tight hidden sm:block transition-colors duration-200 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              Kishor
-            </span>
-          </button>
-
-          {/* ── Center pill nav ── */}
-          <div
-            className="hidden md:flex items-center"
             style={{
-              background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(14px)',
-              border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.08)',
+              width: 34,
+              height: 34,
               borderRadius: 999,
-              padding: '6px 8px',
-              gap: 4,
-            }}
-          >
-            {NAV_ITEMS.map(item => {
-              const isActive = activeSection === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className="relative text-sm font-semibold transition-all duration-200"
-                  style={{
-                    padding: '10px 18px',
-                    borderRadius: 999,
-                    color: isActive
-                      ? (isLight ? '#FF7A1A' : '#fff')
-                      : (isLight ? '#475569' : '#B8B8B8'),
-                    background: isActive
-                      ? (isLight ? 'rgba(255,122,26,0.12)' : 'rgba(255,255,255,0.10)')
-                      : 'transparent',
-                  }}
-                >
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-pill"
-                      className="absolute inset-0 rounded-full"
-                      style={{ background: isLight ? 'rgba(255,122,26,0.12)' : 'rgba(255,255,255,0.08)' }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                    />
-                  )}
-                  <span className="relative z-10">{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* ── Right: Hire Me ── */}
-          <button
-            onClick={() => setActiveSection('contact')}
-            className="hidden md:flex items-center font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shrink-0"
-            style={{
-              height: 44,
-              padding: '0 24px',
-              borderRadius: 999,
-              fontSize: 14,
               background: 'linear-gradient(135deg,#FF7A1A,#FF9B52)',
-              boxShadow: '0 8px 24px rgba(255,122,26,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              fontSize: 15,
+              color: '#fff',
+              cursor: 'pointer',
+              flexShrink: 0,
+              border: 'none',
+              marginRight: 4,
             }}
           >
-            Hire Me
+            K
           </button>
 
-          {/* ── Mobile hamburger ── */}
+          {/* Nav items */}
+          {NAV_ITEMS.map(item => {
+            const isActive = activeSection === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                className="relative text-sm font-semibold transition-all duration-200"
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  color: isActive
+                    ? (isLight ? '#111' : '#fff')
+                    : (isLight ? '#555' : 'rgba(255,255,255,0.60)'),
+                  background: isActive
+                    ? (isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.14)')
+                    : 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 13.5,
+                  fontWeight: isActive ? 600 : 500,
+                  letterSpacing: '0.01em',
+                  transition: 'color 0.2s, background 0.2s',
+                }}
+              >
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full"
+                    style={{ background: isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.12)' }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <span className="relative z-10">{item.label}</span>
+              </button>
+            );
+          })}
+
+          {/* Resume button */}
           <button
-            className={`md:hidden p-2 transition-colors ${isLight ? 'text-slate-900' : 'text-white'}`}
-            onClick={() => setOpen(!open)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            onClick={() => window.open('/resume.pdf', '_blank')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 999,
+              background: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)',
+              border: isLight ? '1px solid rgba(0,0,0,0.10)' : '1px solid rgba(255,255,255,0.12)',
+              color: isLight ? '#333' : 'rgba(255,255,255,0.70)',
+              fontSize: 13.5,
+              fontWeight: 500,
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+              marginLeft: 4,
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                isLight ? 'rgba(0,0,0,0.11)' : 'rgba(255,255,255,0.14)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)';
+            }}
           >
-            {open ? <X size={24} /> : <Menu size={24} />}
+            Resume
           </button>
-        </div>
+        </motion.div>
+      </div>
+
+      {/* ── Mobile: top bar ── */}
+      <div
+        className="md:hidden flex items-center justify-between px-5 h-16"
+        style={{
+          pointerEvents: 'auto',
+          background: scrolled ? 'rgba(15,15,17,0.92)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(20px)' : 'none',
+          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          transition: 'background 0.3s',
+        }}
+      >
+        <button
+          onClick={() => setActiveSection('hero')}
+          aria-label="Home"
+          style={{
+            width: 36, height: 36, borderRadius: 999,
+            background: 'linear-gradient(135deg,#FF7A1A,#FF9B52)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 900, fontSize: 15, color: '#fff', border: 'none', cursor: 'pointer',
+          }}
+        >
+          K
+        </button>
+        <button
+          className="p-2 text-white"
+          onClick={() => setOpen(!open)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          style={{ pointerEvents: 'auto' }}
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
 
       {/* Mobile drawer */}
@@ -142,7 +190,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
           <motion.div
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             className="md:hidden border-b border-white/8 p-6 flex flex-col gap-2"
-            style={{ background: 'rgba(15,15,17,0.97)', backdropFilter: 'blur(20px)' }}
+            style={{ pointerEvents: 'auto', background: 'rgba(15,15,17,0.97)', backdropFilter: 'blur(20px)' }}
           >
             {NAV_ITEMS.map(item => (
               <button key={item.id}
@@ -156,10 +204,10 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection, setActiveSection }) => {
               </button>
             ))}
             <button
-              onClick={() => { setActiveSection('contact'); setOpen(false); }}
+              onClick={() => window.open('/resume.pdf', '_blank')}
               className="mt-2 py-3 rounded-2xl font-bold text-white"
-              style={{ background: 'linear-gradient(135deg,#FF7A1A,#FF9B52)' }}>
-              Hire Me
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              Resume
             </button>
           </motion.div>
         )}

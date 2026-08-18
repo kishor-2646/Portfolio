@@ -56,8 +56,8 @@ const SkillRow = ({
       onHoverEnd={onLeave}
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-default"
       style={{
-        background:   isHovered ? 'rgba(255,126,51,0.06)' : '#fff',
-        borderColor:  isHovered ? 'rgba(255,126,51,0.3)'  : 'rgba(203,213,225,0.7)',
+        background:   isHovered ? 'rgba(255,126,51,0.08)' : 'rgba(255,255,255,0.025)',
+        borderColor:  isHovered ? 'rgba(255,126,51,0.35)' : 'rgba(255,255,255,0.07)',
         transition:   `background ${dur.fast}s, border-color ${dur.fast}s, opacity ${dur.normal}s`,
       }}
     >
@@ -73,7 +73,7 @@ const SkillRow = ({
 
       {/* Name */}
       <span className="text-sm font-semibold flex-1 truncate"
-        style={{ color: isHovered ? '#FF7E33' : '#475569', transition: `color ${dur.fast}s` }}>
+        style={{ color: isHovered ? '#FF7E33' : 'rgba(255,255,255,0.85)', transition: `color ${dur.fast}s` }}>
         {skill.name}
       </span>
 
@@ -81,13 +81,13 @@ const SkillRow = ({
       <div className="flex gap-[3px]">
         {[1,2,3,4,5].map(s => (
           <div key={s} className="h-[5px] w-[9px] rounded-full transition-colors duration-200"
-            style={{ backgroundColor: s <= level ? '#FF7E33' : '#E2E8F0' }} />
+            style={{ backgroundColor: s <= level ? '#FF7E33' : 'rgba(255,255,255,0.12)' }} />
         ))}
       </div>
 
       {/* Level label */}
       <span className="text-[9px] font-bold w-20 text-right"
-        style={{ color: isHovered ? '#FF7E33' : '#94a3b8', transition: `color ${dur.fast}s` }}>
+        style={{ color: isHovered ? '#FF7E33' : 'rgba(255,255,255,0.40)', transition: `color ${dur.fast}s` }}>
         {LEVEL_LABELS[level - 1]}
       </span>
     </motion.div>
@@ -107,25 +107,29 @@ const SkillCard = ({ cat, cardDelay }: { cat: typeof SKILL_CATEGORIES[0]; cardDe
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: dur.reveal, delay: cardDelay, ease: ease.out }}
-      className="relative bg-slate-50/80 border border-slate-200/80 rounded-2xl overflow-hidden"
-      style={{ transition: `border-color ${dur.normal}s, box-shadow ${dur.normal}s` }}
-      whileHover={{ borderColor: 'rgba(255,126,51,0.25)', boxShadow: '0 8px 28px rgba(0,0,0,0.05)' }}
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background: 'rgba(255,255,255,0.025)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        transition: `border-color ${dur.normal}s, box-shadow ${dur.normal}s`,
+      }}
+      whileHover={{ borderColor: 'rgba(255,126,51,0.3)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
     >
       <div className="p-6 space-y-4">
         {/* Card header */}
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-orange-50 rounded-xl">
+          <div className="p-2.5 bg-white/5 rounded-xl border border-white/8">
             <cat.icon size={20} className="text-[#FF7E33]" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-slate-900">{cat.name}</h3>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <h3 className="text-sm font-black text-white">{cat.name}</h3>
+            <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">
               {cat.skills.length} technologies
             </p>
           </div>
         </div>
 
-        <div className="h-px bg-slate-200" />
+        <div className="h-px bg-white/8" />
 
         {/* Skills */}
         <div className="flex flex-col gap-1.5">
@@ -152,7 +156,11 @@ interface SkillsProps {
 
 export default function SkillsSection({ contentOpacity }: SkillsProps) {
   return (
-    <section id="skills" className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 bg-white text-slate-900 overflow-hidden">
+    <section
+      id="skills"
+      className="relative py-24 md:py-28 px-6 md:px-10 lg:px-20 text-white overflow-hidden"
+      style={{ background: '#000000' }}
+    >
       <motion.div className="max-w-7xl mx-auto space-y-14 relative z-10" style={{ opacity: contentOpacity }}>
 
         {/* Section header */}
@@ -162,12 +170,12 @@ export default function SkillsSection({ contentOpacity }: SkillsProps) {
               <div className="h-px w-12 bg-[#FF7E33]/50" />
               <span className="text-xs font-black text-[#FF7E33] uppercase tracking-[0.35em]">Technical Skills</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight">
               Stack & Expertise.
             </h2>
             <div className="h-1 w-16 rounded-full bg-[#FF7E33]" />
           </div>
-          <p className="max-w-sm text-slate-500 text-sm">
+          <p className="max-w-sm text-white/50 text-sm">
             Every tool earned through real production use — not just tutorials.
           </p>
         </motion.div>

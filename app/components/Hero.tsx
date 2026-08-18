@@ -1,34 +1,39 @@
 "use client";
 
 /**
- * Hero.tsx — Cinematic monochrome hero.
+ * Hero.tsx — Reference-matched layout
  *
- * Fixes applied:
- *   1. Portrait — taller container (85vh), object-contain, mask starts at 78%
- *   2. Rotating tagline — slide-up/out infinite loop
- *   3. Cursor-reactive soft white radial light (rAF lerp, CSS custom props)
- *   4. Subtle cursor-based portrait parallax (rAF lerp, refs only)
- *   5. Hero min-height 100svh, section overflow:visible so next section enters cleanly
+ * Layout matches reference (Divesh portfolio):
+ *  - Navbar: single centered pill (handled in Navbar.tsx)
+ *  - "Hi, I'm Kishor" + rotating tagline: LEFT-ALIGNED, upper portion
+ *  - Portrait: LARGE, centered, absolute — dominates the viewport
+ *  - CTA + tech strip: fixed to bottom center
+ *  - Glow: soft radial behind the head
  */
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Github, Linkedin, Mail, ArrowRight } from "lucide-react";
-import { NAME, ROLE, EMAIL, SOCIAL } from "../lib/data";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useSpring,
+} from "framer-motion";
+import { NAME, ROLE } from "../lib/data";
 import { ease } from "../lib/motion";
 
-/* ── Bezier tuple type (Framer Motion requirement) ─────── */
+/* ── Bezier tuple type ───────────────────────────────────── */
 type Bezier = [number, number, number, number];
-const easeOut: Bezier   = ease.out as unknown as Bezier;
-const easeStd: Bezier   = [0.4, 0, 0.2, 1];
-const easeSnap: Bezier  = [0.76, 0, 0.24, 1];
+const easeOut: Bezier = ease.out as unknown as Bezier;
+const easeStd: Bezier = [0.4, 0, 0.2, 1];
+const easeSnap: Bezier = [0.76, 0, 0.24, 1];
 
 /* ── Identity ───────────────────────────────────────────── */
 const firstName = NAME.split(" ")[0]; // "Kishor"
 
 /* ── Rotating taglines ──────────────────────────────────── */
 const TAGLINES = [
-  ROLE,                          // "Software Engineer"
+  ROLE,                       // "Software Engineer"
   "Full-Stack Developer",
   "Mobile App Developer",
   "Problem Solver",
@@ -36,24 +41,22 @@ const TAGLINES = [
 
 /* ── Entrance timing (seconds) ──────────────────────────── */
 const T = {
-  greeting: 0.25,
-  role:     0.50,
-  portrait: 0.75,
-  glow:     1.10,
-  cta:      1.30,
-  social:   1.50,
+  greeting: 0.20,
+  role: 0.40,
+  portrait: 0.60,
+  cta: 1.10,
 };
 
 /* ── Reusable animation helpers ─────────────────────────── */
 const fadeUp = (delay: number, distance = 14) => ({
-  initial:    { opacity: 0, y: distance },
-  animate:    { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: distance },
+  animate: { opacity: 1, y: 0 },
   transition: { duration: 0.65, delay, ease: easeOut },
 });
 
 const fadeIn = (delay: number, duration = 0.8) => ({
-  initial:    { opacity: 0 },
-  animate:    { opacity: 1 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
   transition: { duration, delay, ease: easeStd },
 });
 
@@ -63,67 +66,109 @@ export interface HeroProps {
 }
 
 /* ════════════════════════════════════════════════════════════
-   ROTATING TAGLINE — fixed-height clipping viewport
-   Current text slides up + fades out; next slides up + fades in.
+   ROTATING TAGLINE
+   • Phase 1: Current phrase exits as ONE complete unit (.exit-anim)
+   • Phase 2: Next phrase enters character-by-character (.char)
 ════════════════════════════════════════════════════════════ */
 function RotatingTagline() {
   const prefersReduced = useReducedMotion();
   const [index, setIndex] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    if (prefersReduced) return;
-    const id = setInterval(() => {
-      setIndex(prev => (prev + 1) % TAGLINES.length);
-    }, 3200); // visible pause ≈ 3.2s (transition = 0.6s, so total ≈ 3.8s per cycle)
-    return () => clearInterval(id);
-  }, [prefersReduced]);
+    if (prefersReduced) {
+      const timer = setInterval(() => {
+        setIndex(prev => (prev + 1) % TAGLINES.length);
+      }, 3200);
+      return () => clearInterval(timer);
+    }
+
+    if (!isExiting) {
+      // Hold phrase visible before triggering exit
+      const holdTimer = setTimeout(() => {
+        setIsExiting(true);
+      }, 2800);
+      return () => clearTimeout(holdTimer);
+    } else {
+      // Wait for exit animation (0.4s) to finish, then cycle to next phrase
+      const exitTimer = setTimeout(() => {
+        setIndex(prev => (prev + 1) % TAGLINES.length);
+        setIsExiting(false);
+      }, 400);
+      return () => clearTimeout(exitTimer);
+    }
+  }, [index, isExiting, prefersReduced]);
 
   const label = TAGLINES[index];
-  // Split: all words before last = regular, last word = italic
   const words = label.split(" ");
-  const body  = words.slice(0, -1).join(" ");
-  const last  = words[words.length - 1];
 
   return (
-    /* Fixed-height clipping viewport — overflow hidden hides entering/leaving text */
     <div
+      className="tagline-container"
       style={{
-        /* Match the h1 line-height so only one line shows at a time */
-        overflow:   "hidden",
-        /* Precise height: fontSize * lineHeight. We use a generous value
-           that still clips. The fontSize for this element is ~clamp(28px,4.6vw,62px).
-           At 1.15 lineHeight, max ≈ 72px. We give a bit of room. */
-        height:     "clamp(36px, 5.6vw, 76px)",
-        display:    "flex",
-        alignItems: "flex-end",   /* text sits at the bottom baseline of the viewport */
+        overflow: "hidden",
+        height: "clamp(52px, 7.8vw, 100px)",
+        display: "flex",
+        alignItems: "center",
+        padding: "4px 20px 14px 0",
       }}
     >
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.p
-          key={index}
-          initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 32 }}
-          animate={prefersReduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          exit={prefersReduced    ? { opacity: 0 } : { opacity: 0, y: -32 }}
-          transition={{
-            duration: 0.6,
-            ease: easeSnap,
-          }}
-          style={{
-            margin:        0,
-            padding:       0,
-            fontSize:      "clamp(28px, 4.6vw, 62px)",
-            fontWeight:    400,
-            letterSpacing: "-0.025em",
-            color:         "rgba(255,255,255,0.88)",
-            lineHeight:    1.1,
-            whiteSpace:    "nowrap",
-            willChange:    "transform, opacity",
-          }}
-        >
-          {body && <>{body}{" "}</>}
-          <em style={{ fontStyle: "italic", fontWeight: 400 }}>{last}</em>
-        </motion.p>
-      </AnimatePresence>
+      <div
+        key={index}
+        className={isExiting ? "exit-anim" : ""}
+        style={{
+          margin: 0,
+          padding: 0,
+          fontFamily: "var(--font-serif), 'Instrument Serif', 'Playfair Display', Georgia, serif",
+          fontSize: "clamp(30px, 5vw, 68px)",
+          fontWeight: 400,
+          fontStyle: "italic",
+          letterSpacing: "-0.01em",
+          color: "#ffffff",
+          lineHeight: 1.15,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {prefersReduced ? (
+          label
+        ) : (
+          words.map((word, wordIdx) => {
+            const prevCharsCount = words
+              .slice(0, wordIdx)
+              .reduce((acc, w) => acc + w.length + 1, 0);
+
+            return (
+              <span key={wordIdx} style={{ display: "inline-block", whiteSpace: "nowrap" }}>
+                {word.split("").map((char, charIdx) => {
+                  const globalIdx = prevCharsCount + charIdx;
+                  return (
+                    <span
+                      key={charIdx}
+                      className="char"
+                      style={{
+                        animationDelay: `${globalIdx * 0.04}s`,
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
+                {wordIdx < words.length - 1 && (
+                  <span
+                    className="char"
+                    style={{
+                      animationDelay: `${(prevCharsCount + word.length) * 0.04}s`,
+                    }}
+                  >
+                    {"\u00A0"}
+                  </span>
+                )}
+              </span>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }
@@ -135,695 +180,357 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
   const prefersReduced = useReducedMotion();
   const [ready, setReady] = useState(false);
 
-  /* ── Refs (no React state for perf-critical values) ─────── */
-  const sectionRef      = useRef<HTMLElement>(null);
-  /* backdropGlowRef — sits BEHIND the portrait image, anchored at upper-right */
-  const backdropGlowRef = useRef<HTMLDivElement>(null);
-  const portraitRef     = useRef<HTMLDivElement>(null);
-  const arcRef          = useRef<HTMLDivElement>(null);
-  const halftoneRef     = useRef<HTMLDivElement>(null);
-  const streakRef       = useRef<HTMLDivElement>(null);
+  /* ── Refs ───────────────────────────────────────────────── */
+  const sectionRef = useRef<HTMLElement>(null);
 
-  /* Lerped mouse state — fully managed by rAF, never triggers re-render */
-  const mouse = useRef({ tx: 0.5, ty: 0.5, cx: 0.5, cy: 0.5 });
-  const rafId = useRef<number>(0);
-  const insideHero = useRef(false);
+  /* ── Scroll-driven parallax ─────────────────────────────── */
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const portraitY = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const portraitScale = useTransform(scrollYProgress, [0, 0.7], [1, 0.97]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const textY = useTransform(scrollYProgress, [0, 0.4], [0, -40]);
 
-  /* ── Mount readiness (SSR-safe) ─────────────────────────── */
+  const springCfg = { stiffness: 80, damping: 20, restDelta: 0.001 };
+  const portraitYSpring = useSpring(portraitY, springCfg);
+  const portraitScSpring = useSpring(portraitScale, springCfg);
+
+  /* ── Mount ──────────────────────────────────────────────── */
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  /* ── rAF loop — cursor light + parallax ─────────────────── */
-  useEffect(() => {
-    if (prefersReduced) return;
-
-    const LERP = 0.055; // smoothing factor — lower = more inertia
-
-    const tick = () => {
-      const m = mouse.current;
-      // Smooth interpolation toward target
-      m.cx += (m.tx - m.cx) * LERP;
-      m.cy += (m.ty - m.cy) * LERP;
-
-      /* ── 1. Backdrop portrait glow — fixed position, opacity driven by hover ── */
-      if (backdropGlowRef.current) {
-        // Intensity: fades in when inside hero, fades out when mouse leaves
-        // Small proximity boost when cursor is near the right half (where the glow lives)
-        const proximityBoost = Math.max(0, (m.cx - 0.3) * 0.4); // stronger on right side
-        const targetOpacity = insideHero.current
-          ? Math.min(1, 0.55 + proximityBoost)
-          : 0.18; // dims but never fully disappears — always atmospheric
-        const currentOpacity = parseFloat(backdropGlowRef.current.style.opacity || "0.18");
-        const nextOpacity = currentOpacity + (targetOpacity - currentOpacity) * LERP;
-        backdropGlowRef.current.style.opacity = String(nextOpacity);
-      }
-
-      /* ── 2. Portrait parallax ──────────────────────── */
-      // Offset from center: range -1..1
-      const dx = (m.cx - 0.5) * 2;
-      const dy = (m.cy - 0.5) * 2;
-
-      if (portraitRef.current) {
-        // Portrait: up to ±10px horizontal, ±5px vertical
-        portraitRef.current.style.transform =
-          `translate(${dx * 10}px, ${dy * 5}px)`;
-      }
-      if (arcRef.current) {
-        // Arc: opposite direction, smaller — gives depth
-        arcRef.current.style.transform =
-          `translate(${dx * -7}px, ${dy * -4}px)`;
-      }
-      if (halftoneRef.current) {
-        // Halftone: lazy, same direction as portrait but slower
-        halftoneRef.current.style.transform =
-          `translate(${dx * 5}px, ${dy * 3}px)`;
-      }
-      if (streakRef.current) {
-        // Streak: different axis emphasis
-        streakRef.current.style.transform =
-          `translate(${dx * -4}px, ${dy * 6}px)`;
-      }
-
-      rafId.current = requestAnimationFrame(tick);
-    };
-
-    rafId.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId.current);
-  }, [prefersReduced]);
-
-  /* ── Mouse tracking — only inside hero ──────────────────── */
-  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    mouse.current.tx = (e.clientX - rect.left) / rect.width;
-    mouse.current.ty = (e.clientY - rect.top)  / rect.height;
-  }, []);
-
-  const onMouseEnter = useCallback(() => { insideHero.current = true;  }, []);
-  const onMouseLeave = useCallback(() => {
-    insideHero.current = false;
-    // Reset target to center so light fades back
-    mouse.current.tx = 0.5;
-    mouse.current.ty = 0.5;
-  }, []);
-
   return (
-    <section
-      id="hero"
-      ref={sectionRef}
-      onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={{
-        position:      "relative",
-        width:         "100%",
-        minHeight:     "100svh",
-        /* overflow visible — next section enters naturally without clipping portrait */
-        overflow:      "hidden",
-        display:       "flex",
-        flexDirection: "column",
-        alignItems:    "center",
-        background:    "#080808",
-      }}
-    >
-
-      {/* ── Subtle edge vignette ─────────────────────────────── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:      "absolute",
-          inset:         0,
-          pointerEvents: "none",
-          zIndex:        0,
-          background: `
-            radial-gradient(ellipse 80% 60% at 50% 0%,   transparent 40%, rgba(0,0,0,0.5) 100%),
-            radial-gradient(ellipse 100% 50% at 50% 100%, rgba(0,0,0,0.85) 0%, transparent 55%)
-          `,
-        }}
-      />
-
-      {/* ── Backdrop portrait glow — anchored at upper-right of portrait, BEHIND photo ── */}
-      {/* This is the "light source" that bleeds around the portrait edges */}
-      {/* Positioned at ~60% from left (right side), ~28% from top (head level) */}
-      <div
-        aria-hidden="true"
-        style={{
-          position:      "absolute",
-          /* Upper-right quadrant of the hero — aligns with portrait head/arc position */
-          top:           "18%",
-          left:          "50%",          /* starts at center */
-          transform:     "translateX(8%)", /* shifted right to match arc side */
-          width:         "clamp(280px, 45vw, 580px)",
-          height:        "clamp(280px, 45vw, 580px)",
-          borderRadius:  "50%",
-          /* Multi-stop: very bright white core → soft falloff */
-          background:    `radial-gradient(
-            circle,
-            rgba(255,255,255,0.22) 0%,
-            rgba(255,255,255,0.12) 20%,
-            rgba(255,255,255,0.05) 45%,
-            rgba(255,255,255,0.01) 65%,
-            transparent 80%
-          )`,
-          pointerEvents: "none",
-          zIndex:        2,             /* above vignette but below portrait */
-          opacity:       0.18,          /* always slightly visible — atmospheric */
-          filter:        "blur(32px)",
-          willChange:    "opacity",
-          transition:    "opacity 1.2s ease",
-        }}
-        ref={backdropGlowRef}
-      />
-
-      {/* ══════════════════════════════════════════════════════
-          HERO CONTENT — centered column
-      ══════════════════════════════════════════════════════ */}
-      <div
-        style={{
-          position:      "relative",
-          zIndex:        2,
-          display:       "flex",
-          flexDirection: "column",
-          alignItems:    "center",
-          width:         "100%",
-          minHeight:     "100svh",
-        }}
-      >
-
-        {/* ── TYPOGRAPHY BLOCK ─────────────────────────────── */}
-        <div
+    <>
+      <div style={{ overflowX: "hidden", position: "relative" }}>
+        <section
+          id="hero"
+          ref={sectionRef}
           style={{
-            display:       "flex",
-            flexDirection: "column",
-            alignItems:    "center",
-            textAlign:     "center",
-            paddingTop:    "clamp(96px, 12vh, 130px)",
-            gap:           0,
-            position:      "relative",
-            zIndex:        4,
+            position: "relative",
+            width: "100%",
+            minHeight: "100svh",
+            overflow: "hidden",
+            background: "rgba(0, 0, 0, 1)",
           }}
         >
-          {/* Greeting — "Hi, I'm Kishor" */}
-          <motion.div
-            {...(ready && !prefersReduced ? fadeUp(T.greeting) : {})}
-            style={{ lineHeight: 1.1 }}
-          >
-            <h1
-              style={{
-                margin:        0,
-                fontSize:      "clamp(38px, 6.5vw, 88px)",
-                fontWeight:    300,
-                letterSpacing: "-0.03em",
-                color:         "rgba(255,255,255,0.92)",
-                lineHeight:    1.05,
-              }}
-            >
-              <span style={{ fontWeight: 300 }}>Hi, I&apos;m </span>
-              <span style={{ fontWeight: 700 }}>{firstName}</span>
-            </h1>
-          </motion.div>
 
-          {/* Role — rotating tagline with slide-up transitions */}
-          <motion.div
-            {...(ready && !prefersReduced ? fadeUp(T.role) : {})}
-            style={{ marginTop: "clamp(4px, 0.8vh, 10px)" }}
-          >
-            <RotatingTagline />
-          </motion.div>
-        </div>
 
-        {/* ══════════════════════════════════════════════════════
-            PORTRAIT CONTAINER
-            bottom:0 anchors to hero bottom.
-            Height: 85vh — enough to show head + shoulders + torso.
-            Width: generous, portrait uses object-contain so full
-            body is never cropped by the container edges.
-        ══════════════════════════════════════════════════════ */}
-        <div
-          style={{
-            position:      "absolute",
-            bottom:        0,
-            left:          "50%",
-            transform:     "translateX(-50%)",
-            /* Wide enough that object-contain doesn't squeeze the image */
-            width:         "clamp(300px, 58vw, 700px)",
-            /* Tall enough to show head + full torso down to feet */
-            height:        "clamp(460px, 85vh, 980px)",
-            zIndex:        3,
-            pointerEvents: "none",
-          }}
-          ref={cardBoxRefCallback}
-        >
-          {/* Portrait entrance — rises from below, fades in */}
+          {/* ── Portrait — absolute, centered, large ── */}
           <motion.div
-            {...(ready && !prefersReduced
-              ? {
-                  initial:    { opacity: 0, y: 50 },
-                  animate:    { opacity: 1, y: 0  },
-                  transition: { duration: 1.2, delay: T.portrait, ease: [0.16, 1, 0.3, 1] as Bezier },
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              x: "-50%",
+              y: prefersReduced ? 0 : portraitYSpring,
+              scale: prefersReduced ? 1 : portraitScSpring,
+              width: "clamp(340px, 52vw, 780px)",
+              height: "auto",
+              zIndex: 2,
+              pointerEvents: "none",
+              willChange: "transform",
+              transformOrigin: "bottom center",
+            }}
+            ref={cardBoxRefCallback}
+          >
+
+            {/* Entrance animation — on top of glow */}
+            <motion.div
+              {...(ready && !prefersReduced
+                ? {
+                  initial: { opacity: 0, y: 60, scale: 1.04 },
+                  animate: { opacity: 1, y: 0, scale: 1 },
+                  transition: { duration: 1.3, delay: T.portrait, ease: [0.16, 1, 0.3, 1] as Bezier },
                 }
-              : {}
-            )}
-            style={{ width: "100%", height: "100%", position: "relative" }}
-          >
-            {/* ── Parallax wrapper for portrait image ───────── */}
-            <div
-              ref={portraitRef}
-              style={{
-                width:      "100%",
-                height:     "100%",
-                willChange: "transform",
-                position:   "relative",
-              }}
+                : {}
+              )}
+              style={{ width: "100%", position: "relative", zIndex: 2 }}
             >
-              {/* Portrait image — B&W, no border, no card.
-                  object-fit: contain ensures the full figure is visible.
-                  The container width/height dictates the visible portion.
-                  Mask starts at 80% so only the very bottom blends. */}
               <img
-                src="/photo.jpeg"
+                src="/potrait.png"
                 alt={`${NAME} — ${ROLE}`}
                 style={{
-                  width:          "100%",
-                  height:         "100%",
-                  /* contain = full figure visible, no cropping by box edges */
-                  objectFit:      "contain",
-                  objectPosition: "center bottom",
-                  filter:         "grayscale(100%) contrast(1.10) brightness(0.90)",
-                  display:        "block",
-                  userSelect:     "none",
-                  /* Bottom fade — starts very late so body remains visible */
+                  width: "100%",
+                  height: "auto",
+                  display: "block",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  filter: "contrast(1.08) brightness(0.92)",
+                  userSelect: "none",
+                  /* Fade out at bottom only */
                   WebkitMaskImage: `linear-gradient(
                     to bottom,
                     black 0%,
-                    black 72%,
-                    rgba(0,0,0,0.6) 85%,
+                    black 80%,
+                    rgba(0,0,0,0.45) 92%,
                     transparent 100%
                   )`,
                   maskImage: `linear-gradient(
                     to bottom,
                     black 0%,
-                    black 72%,
-                    rgba(0,0,0,0.6) 85%,
+                    black 80%,
+                    rgba(0,0,0,0.45) 92%,
                     transparent 100%
                   )`,
                 }}
                 draggable={false}
               />
-            </div>
-
-            {/* ── White arc glow + sparkles — top-right of head ── */}
-            {/* Matches reference: bright bloomed arc + star cluster */}
-            <div
-              ref={arcRef}
-              style={{
-                position:   "absolute",
-                /* Positioned so arc wraps upper-right of the head */
-                top:        "-2%",
-                right:      "2%",
-                width:      "clamp(80px, 18vw, 220px)",
-                height:     "clamp(80px, 18vw, 220px)",
-                willChange: "transform",
-                overflow:   "visible",
-              }}
-            >
-              <motion.div
-                {...(ready && !prefersReduced ? fadeIn(T.glow, 0.9) : {})}
-                style={{ width: "100%", height: "100%", overflow: "visible" }}
-              >
-                <svg
-                  viewBox="0 0 220 220"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ width: "100%", height: "100%", overflow: "visible" }}
-                >
-                  <defs>
-                    {/* Heavy bloom blur for the outer glow halo */}
-                    <filter id="arcBloom" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="8" result="blur" />
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="blur" />
-                      </feMerge>
-                    </filter>
-                    {/* Medium blur for mid glow */}
-                    <filter id="arcMid" x="-30%" y="-30%" width="160%" height="160%">
-                      <feGaussianBlur stdDeviation="3.5" />
-                    </filter>
-                    {/* Soft sparkle blur */}
-                    <filter id="sparkleBlur">
-                      <feGaussianBlur stdDeviation="1.2" />
-                    </filter>
-                  </defs>
-
-                  {/* Layer 1: Outermost wide bloom halo — very soft, wide */}
-                  <circle
-                    cx="110" cy="110" r="94"
-                    stroke="white" strokeWidth="32" strokeOpacity="0.06"
-                    fill="none" filter="url(#arcBloom)"
-                    strokeDasharray="180 400"
-                    strokeDashoffset="-30"
-                    strokeLinecap="round"
-                  />
-                  {/* Layer 2: Medium glow ring */}
-                  <circle
-                    cx="110" cy="110" r="90"
-                    stroke="white" strokeWidth="12" strokeOpacity="0.18"
-                    fill="none" filter="url(#arcMid)"
-                    strokeDasharray="160 400"
-                    strokeDashoffset="-28"
-                    strokeLinecap="round"
-                  />
-                  {/* Layer 3: Inner bright crisp arc — the main visible element */}
-                  <circle
-                    cx="110" cy="110" r="88"
-                    stroke="white" strokeWidth="2.2" strokeOpacity="0.92"
-                    fill="none"
-                    strokeDasharray="130 400"
-                    strokeDashoffset="-22"
-                    strokeLinecap="round"
-                  />
-                  {/* Layer 4: Highlight — very thin bright center of arc */}
-                  <circle
-                    cx="110" cy="110" r="88"
-                    stroke="white" strokeWidth="0.8" strokeOpacity="1"
-                    fill="none"
-                    strokeDasharray="50 480"
-                    strokeDashoffset="30"
-                    strokeLinecap="round"
-                  />
-
-                  {/* ── SPARKLES — match reference: cluster near arc peak ── */}
-                  {/* Large sparkle at arc endpoint (top-right) */}
-                  <g transform="translate(189, 44)" opacity="1">
-                    <line x1="0" y1="-9" x2="0" y2="9"    stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-                    <line x1="-9" y1="0" x2="9" y2="0"    stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-                    <line x1="-6" y1="-6" x2="6" y2="6"  stroke="white" strokeWidth="0.9" strokeLinecap="round"/>
-                    <line x1="6"  y1="-6" x2="-6" y2="6" stroke="white" strokeWidth="0.9" strokeLinecap="round"/>
-                  </g>
-                  {/* Medium sparkle slightly left of arc peak */}
-                  <g transform="translate(168, 25)" opacity="0.75">
-                    <line x1="0" y1="-6" x2="0" y2="6"    stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
-                    <line x1="-6" y1="0" x2="6" y2="0"    stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
-                    <line x1="-4" y1="-4" x2="4" y2="4"  stroke="white" strokeWidth="0.7" strokeLinecap="round"/>
-                    <line x1="4"  y1="-4" x2="-4" y2="4" stroke="white" strokeWidth="0.7" strokeLinecap="round"/>
-                  </g>
-                  {/* Small sparkle above */}
-                  <g transform="translate(148, 12)" opacity="0.55">
-                    <line x1="0" y1="-4.5" x2="0" y2="4.5" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    <line x1="-4.5" y1="0" x2="4.5" y2="0" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                  </g>
-                  {/* Tiny dot cluster — upper area, fanning out */}
-                  <g transform="translate(125, 8)" opacity="0.4">
-                    <line x1="0" y1="-3" x2="0" y2="3" stroke="white" strokeWidth="0.8" strokeLinecap="round"/>
-                    <line x1="-3" y1="0" x2="3" y2="0" stroke="white" strokeWidth="0.8" strokeLinecap="round"/>
-                  </g>
-                  {/* Sparkle scattered further from arc — smaller */}
-                  <g transform="translate(205, 75)" opacity="0.45">
-                    <line x1="0" y1="-4" x2="0" y2="4"  stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    <line x1="-4" y1="0" x2="4" y2="0"  stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                  </g>
-                  <g transform="translate(212, 110)" opacity="0.28">
-                    <line x1="0" y1="-3" x2="0" y2="3"  stroke="white" strokeWidth="0.8" strokeLinecap="round"/>
-                    <line x1="-3" y1="0" x2="3" y2="0"  stroke="white" strokeWidth="0.8" strokeLinecap="round"/>
-                  </g>
-                  {/* Micro dots near arc — small circles instead of crosses */}
-                  <circle cx="138" cy="6"  r="1.5" fill="white" opacity="0.5" />
-                  <circle cx="110" cy="18" r="1.2" fill="white" opacity="0.35" />
-                  <circle cx="200" cy="60" r="1"   fill="white" opacity="0.4" />
-                  <circle cx="207" cy="90" r="0.8" fill="white" opacity="0.25" />
-                </svg>
-              </motion.div>
-            </div>
-
-            {/* ── Halftone dot grid — upper right ────────────── */}
-            <div
-              ref={halftoneRef}
-              style={{
-                position:   "absolute",
-                top:        "6%",
-                right:      "-3%",
-                width:      "clamp(50px, 10vw, 120px)",
-                height:     "clamp(50px, 10vw, 120px)",
-                willChange: "transform",
-              }}
-            >
-              <motion.div
-                {...(ready && !prefersReduced ? fadeIn(T.glow + 0.15, 0.8) : {})}
-                aria-hidden="true"
-                style={{
-                  width:           "100%",
-                  height:          "100%",
-                  backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.55) 1px, transparent 1px)`,
-                  backgroundSize:  "clamp(6px, 1.2vw, 10px) clamp(6px, 1.2vw, 10px)",
-                  WebkitMaskImage: "radial-gradient(ellipse at 90% 20%, white 10%, transparent 75%)",
-                  maskImage:       "radial-gradient(ellipse at 90% 20%, white 10%, transparent 75%)",
-                }}
-              />
-            </div>
-
-            {/* ── Left-side subtle glow streak ───────────────── */}
-            <div
-              ref={streakRef}
-              style={{
-                position:   "absolute",
-                bottom:     "30%",
-                left:       "-8%",
-                width:      "clamp(40px, 8vw, 90px)",
-                height:     "clamp(100px, 20vw, 220px)",
-                willChange: "transform",
-              }}
-            >
-              <motion.div
-                {...(ready && !prefersReduced ? fadeIn(T.glow + 0.3, 1.0) : {})}
-                aria-hidden="true"
-                style={{ width: "100%", height: "100%" }}
-              >
-                <svg viewBox="0 0 90 220" fill="none" style={{ width: "100%", height: "100%", overflow: "visible" }}>
-                  <defs>
-                    <linearGradient id="streakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%"   stopColor="white" stopOpacity="0"   />
-                      <stop offset="40%"  stopColor="white" stopOpacity="0.7" />
-                      <stop offset="100%" stopColor="white" stopOpacity="0"   />
-                    </linearGradient>
-                    <filter id="streakBlur">
-                      <feGaussianBlur stdDeviation="2.5" />
-                    </filter>
-                  </defs>
-                  <line x1="60" y1="10" x2="10" y2="200"
-                    stroke="url(#streakGrad)" strokeWidth="2"
-                    strokeLinecap="round" filter="url(#streakBlur)"
-                  />
-                  <g opacity="0.6">
-                    {[0,1,2,3,4].map(row =>
-                      [0,1,2,3].map(col => (
-                        <circle
-                          key={`${row}-${col}`}
-                          cx={col * 8 + 18}
-                          cy={row * 8 + 170}
-                          r="1.2"
-                          fill="white"
-                          opacity={0.8 - row * 0.12 - col * 0.06}
-                        />
-                      ))
-                    )}
-                  </g>
-                </svg>
-              </motion.div>
-            </div>
-
+            </motion.div>
           </motion.div>
-        </div>
 
-        {/* ══════════════════════════════════════════════════════
-            BOTTOM CTA AREA
-        ══════════════════════════════════════════════════════ */}
-        <div
-          style={{
-            position:       "absolute",
-            bottom:         "clamp(20px, 4vh, 48px)",
-            left:           0,
-            right:          0,
-            zIndex:         5,
-            display:        "flex",
-            flexDirection:  "column",
-            alignItems:     "center",
-            gap:            "clamp(12px, 2vh, 20px)",
-          }}
-        >
-          {/* "Previously worked with" strip */}
+          {/* ── TEXT — left-aligned, upper portion, above portrait ── */}
           <motion.div
-            {...(ready && !prefersReduced ? fadeIn(T.cta, 0.7) : {})}
             style={{
-              display:        "flex",
-              alignItems:     "center",
-              gap:            10,
-              flexWrap:       "wrap",
-              justifyContent: "center",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 4,
+              opacity: prefersReduced ? 1 : textOpacity,
+              y: prefersReduced ? 0 : textY,
+              willChange: "opacity, transform",
+              /* Align text to left within a max-width container */
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              paddingTop: "clamp(80px, 11vh, 120px)",
+              paddingLeft: "clamp(24px, 8vw, 160px)",
             }}
           >
-            <span
-              style={{
-                fontSize:      12.5,
-                fontWeight:    400,
-                color:         "rgba(255,255,255,0.35)",
-                letterSpacing: "0.01em",
-              }}
+            {/* "Hi, I'm Kishor" */}
+            <motion.div
+              {...(ready && !prefersReduced ? fadeUp(T.greeting) : {})}
             >
-              Previously worked with
-            </span>
-            {["Flutter", "Firebase", "Java", "Supabase"].map((tech) => (
-              <span
-                key={tech}
+              <h1
                 style={{
-                  fontSize:      11.5,
-                  fontWeight:    500,
-                  color:         "rgba(255,255,255,0.30)",
-                  border:        "1px solid rgba(255,255,255,0.09)",
-                  borderRadius:  999,
-                  padding:       "3px 10px",
-                  letterSpacing: "0.03em",
+                  margin: 0,
+                  fontSize: "clamp(36px, 6vw, 82px)",
+                  fontWeight: 300,
+                  letterSpacing: "-0.03em",
+                  color: "rgba(255,255,255,0.95)",
+                  lineHeight: 1.08,
                 }}
               >
-                {tech}
-              </span>
-            ))}
+                <span style={{ fontWeight: 300 }}>Hi, I&apos;m </span>
+                <span style={{ fontWeight: 700 }}>{firstName}</span>
+              </h1>
+            </motion.div>
+
+            {/* Rotating tagline */}
+            <motion.div
+              {...(ready && !prefersReduced ? fadeUp(T.role) : {})}
+              style={{ marginTop: "clamp(4px, 0.6vh, 8px)" }}
+            >
+              <RotatingTagline />
+            </motion.div>
           </motion.div>
 
-          {/* CTA buttons */}
-          <motion.div
-            {...(ready && !prefersReduced ? fadeIn(T.cta + 0.1, 0.7) : {})}
+          {/* ── BOTTOM CTA AREA ── */}
+          <div
             style={{
-              display:        "flex",
-              gap:            "clamp(10px, 2vw, 16px)",
-              flexWrap:       "wrap",
-              justifyContent: "center",
-            }}
-          >
-            {/* Primary */}
-            <motion.a
-              href="#projects"
-              onClick={e => {
-                e.preventDefault();
-                document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.2, ease: easeOut }}
-              style={{
-                display:        "flex",
-                alignItems:     "center",
-                gap:            8,
-                padding:        "clamp(12px,1.8vh,16px) clamp(22px,3.5vw,38px)",
-                borderRadius:   999,
-                fontSize:       "clamp(13px, 1.2vw, 15px)",
-                fontWeight:     500,
-                color:          "rgba(255,255,255,0.9)",
-                background:     "rgba(255,255,255,0.08)",
-                border:         "1px solid rgba(255,255,255,0.14)",
-                backdropFilter: "blur(10px)",
-                cursor:         "pointer",
-                textDecoration: "none",
-                letterSpacing:  "0.01em",
-                transition:     "background 0.25s, border-color 0.25s",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background    = "rgba(255,255,255,0.13)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor   = "rgba(255,255,255,0.25)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLAnchorElement).style.background    = "rgba(255,255,255,0.08)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor   = "rgba(255,255,255,0.14)";
-              }}
-            >
-              View Work
-              <ArrowRight size={14} style={{ opacity: 0.7 }} />
-            </motion.a>
-
-            {/* Secondary */}
-            <motion.a
-              href="#contact"
-              onClick={e => {
-                e.preventDefault();
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ duration: 0.2, ease: easeOut }}
-              style={{
-                display:        "flex",
-                alignItems:     "center",
-                gap:            8,
-                padding:        "clamp(12px,1.8vh,16px) clamp(22px,3.5vw,38px)",
-                borderRadius:   999,
-                fontSize:       "clamp(13px, 1.2vw, 15px)",
-                fontWeight:     500,
-                color:          "rgba(255,255,255,0.55)",
-                background:     "rgba(255,255,255,0.03)",
-                border:         "1px solid rgba(255,255,255,0.10)",
-                cursor:         "pointer",
-                textDecoration: "none",
-                letterSpacing:  "0.01em",
-                transition:     "color 0.25s, border-color 0.25s, background 0.25s",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLAnchorElement).style.color        = "rgba(255,255,255,0.85)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor  = "rgba(255,255,255,0.22)";
-                (e.currentTarget as HTMLAnchorElement).style.background   = "rgba(255,255,255,0.06)";
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLAnchorElement).style.color        = "rgba(255,255,255,0.55)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor  = "rgba(255,255,255,0.10)";
-                (e.currentTarget as HTMLAnchorElement).style.background   = "rgba(255,255,255,0.03)";
-              }}
-            >
-              Get in Touch
-            </motion.a>
-          </motion.div>
-
-          {/* Social links */}
-          <motion.div
-            {...(ready && !prefersReduced ? fadeIn(T.social, 0.65) : {})}
-            style={{
-              display:    "flex",
-              gap:        "clamp(16px, 3vw, 28px)",
+              position: "absolute",
+              bottom: "clamp(20px, 4vh, 48px)",
+              left: 0,
+              right: 0,
+              zIndex: 5,
+              display: "flex",
+              flexDirection: "column",
               alignItems: "center",
+              gap: "clamp(10px, 1.8vh, 18px)",
             }}
           >
-            {[
-              { href: SOCIAL.github,     icon: <Github   size={14} />, label: "GitHub"   },
-              { href: SOCIAL.linkedin,   icon: <Linkedin size={14} />, label: "LinkedIn" },
-              { href: `mailto:${EMAIL}`, icon: <Mail     size={14} />, label: "Email"    },
-            ].map(({ href, icon, label }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
+            {/* Tech strip — 'Experienced in' with circular tech logo badges matching reference */}
+            <motion.div
+              {...(ready && !prefersReduced ? fadeIn(T.cta, 0.7) : {})}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <span
                 style={{
-                  display:        "flex",
-                  alignItems:     "center",
-                  gap:            5,
-                  fontSize:       12,
-                  fontWeight:     400,
-                  color:          "rgba(255,255,255,0.28)",
-                  textDecoration: "none",
-                  letterSpacing:  "0.02em",
-                  transition:     "color 0.2s",
+                  fontSize: "clamp(12px, 1vw, 13.5px)",
+                  fontWeight: 400,
+                  color: "rgba(255,255,255,0.46)",
+                  letterSpacing: "-0.01em",
                 }}
-                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.7)"}
-                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.28)"}
               >
-                {icon}
-                {label}
-              </a>
-            ))}
-          </motion.div>
-        </div>
+                Experienced in
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                {[
+                  {
+                    name: "Flutter",
+                    icon: (
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                        <path d="M14.314 0L2.3 12 6 15.7 21.686 0h-7.372zm.014 11.072L7.986 17.414 14.328 24h7.372l-9.56-9.56 3.186-3.368z" fill="#02569B" />
+                        <path d="M14.328 24l-3.156-3.214 3.156-3.372 3.186 3.372L14.328 24z" fill="#0175C2" />
+                        <path d="M7.986 17.414l3.186-3.186 3.156 3.372-3.156 3.214-3.186-3.4z" fill="#42A5F5" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    name: "Firebase",
+                    icon: (
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="#FFA000" d="M3.89 15.67L6.2 1.34c.06-.38.54-.49.77-.19l3.41 4.41-6.49 10.11z"/>
+                        <path fill="#F57F17" d="M14.07 7.73l2.45-4.7c.18-.35.68-.34.84.02l4.75 12.63-8.04-7.95z"/>
+                        <path fill="#FFCA28" d="M22.11 15.68L17.36 3.05a.498.498 0 00-.84-.02l-2.45 4.7 4.19 8.08 3.85-.13z"/>
+                        <path fill="#FFA000" d="M12.06 12.87l-1.68-7.31c-.08-.36-.57-.45-.77-.15L1.89 18.25l10.17-5.38z"/>
+                        <path fill="#F57F17" d="M1.89 18.25l10.17 5.75c.44.25.99.25 1.43 0l8.62-5.75-10.05 5.56-10.17-5.56z"/>
+                        <path fill="#FFCA28" d="M1.89 18.25L12.06 12.87l6.2 2.86-6.2 7.77-10.17-5.25z"/>
+                      </svg>
+                    ),
+                  },
+                  {
+                    name: "Java",
+                    icon: (
+                      <svg viewBox="0 0 24 24" width="19" height="19" fill="none">
+                        {/* Base Saucer */}
+                        <path d="M3 18.8C6.5 20.4 17.5 20.4 21 18.8C18 21.4 6 21.4 3 18.8Z" fill="#38BDF8" />
+                        <path d="M4.5 16.8C7.5 18.2 16.5 18.2 19.5 16.8C16.8 18.8 7.2 18.8 4.5 16.8Z" fill="#0284C7" />
+                        {/* Cup Body */}
+                        <path d="M5 11.2C5 15.2 7.8 16.6 12 16.6C16.2 16.6 19 15.2 19 11.2H5Z" fill="#F8FAFC" />
+                        <path d="M18.2 11.8C19.8 11.8 21 12.6 21 13.7C21 15 19.5 15.7 17.8 15.7" stroke="#F8FAFC" strokeWidth="1.7" strokeLinecap="round" />
+                        {/* Steam 1 */}
+                        <path d="M8.8 8.8C8.2 6.5 10.4 5 9.4 2.8" stroke="#FF7E33" strokeWidth="2" strokeLinecap="round" />
+                        {/* Steam 2 */}
+                        <path d="M12.4 8.2C11.8 5.6 14.2 4.2 13.4 2" stroke="#FFA133" strokeWidth="2" strokeLinecap="round" />
+                        {/* Steam 3 */}
+                        <path d="M16 8.8C15.4 6.5 17.6 5 16.6 2.8" stroke="#FF5722" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    name: "Supabase",
+                    icon: (
+                      <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="#3ECF8E" d="M21.362 9.354H12V.396a.396.396 0 0 0-.716-.233L.61 14.283a.792.792 0 0 0 .616 1.321h9.362v8.958a.396.396 0 0 0 .716.233l10.674-14.12a.792.792 0 0 0-.616-1.321z"/>
+                      </svg>
+                    ),
+                  },
+                ].map(tech => (
+                  <motion.div
+                    key={tech.name}
+                    title={tech.name}
+                    whileHover={{ scale: 1.14, borderColor: "rgba(255,255,255,0.28)" }}
+                    transition={{ duration: 0.18 }}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 999,
+                      background: "rgba(10,10,10,0.85)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "default",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                    }}
+                  >
+                    {tech.icon}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
 
+            {/* CTA Buttons */}
+            <motion.div
+              {...(ready && !prefersReduced ? fadeIn(T.cta + 0.1, 0.7) : {})}
+              style={{
+                display: "flex",
+                gap: "clamp(10px, 2vw, 14px)",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              {/* Primary */}
+              <motion.a
+                href="#projects"
+                onClick={e => {
+                  e.preventDefault();
+                  document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.2, ease: easeOut }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "clamp(11px,1.6vh,15px) clamp(22px,3vw,36px)",
+                  borderRadius: 12,
+                  fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.92)",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  letterSpacing: "0.01em",
+                  transition: "background 0.25s, border-color 0.25s",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.13)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.26)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.08)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.14)";
+                }}
+              >
+                View Impact &amp; Work
+              </motion.a>
+
+              {/* Secondary */}
+              <motion.a
+                href="#contact"
+                onClick={e => {
+                  e.preventDefault();
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.2, ease: easeOut }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "clamp(11px,1.6vh,15px) clamp(22px,3vw,36px)",
+                  borderRadius: 12,
+                  fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                  fontWeight: 500,
+                  color: "rgba(255,255,255,0.92)",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  letterSpacing: "0.01em",
+                  transition: "background 0.25s, border-color 0.25s",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.13)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.26)";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.08)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.14)";
+                }}
+              >
+                Book a 30 min call
+              </motion.a>
+            </motion.div>
+          </div>
+
+        </section>
       </div>
-    </section>
+    </>
   );
 }
