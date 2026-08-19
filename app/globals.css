@@ -40,8 +40,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  /* Prevent horizontal scroll from parallax decorative elements */
-  overflow-x: hidden;
+  /* overflow-x: clip prevents horizontal scroll without breaking position: sticky */
+  overflow-x: clip;
 }
 
 body {
@@ -50,7 +50,7 @@ body {
   font-family: var(--font-outfit, 'Outfit'), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 ::selection {

@@ -174,6 +174,195 @@ function RotatingTagline() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   SILHOUETTE STAR MATRIX & RIM BEAM TYPES & EXTRACTION
+════════════════════════════════════════════════════════════ */
+interface StarMatrixPoint {
+  normX: number;       // normalized 0-1 within image width
+  normY: number;       // normalized 0-1 within image height
+  baseSize: number;    // max arm radius of the 4-point star
+  currentOpacity: number;
+  targetOpacity: number;
+  fadeSpeed: number;
+}
+
+interface ContourVertex {
+  normX: number;
+  normY: number;
+  currentOpacity: number;
+  targetOpacity: number;
+}
+
+interface SilhouetteData {
+  stars: StarMatrixPoint[];
+  contourVertices: ContourVertex[];
+}
+
+/** Draws a luxury 4-point diamond sparkle star (✦) exactly matching reference */
+function draw4PointStar(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  opacity: number
+) {
+  if (opacity <= 0.005 || size <= 0.3) return;
+
+  ctx.save();
+  ctx.beginPath();
+  const innerR = size * 0.18; // sleek pinched diamond waist
+
+  for (let i = 0; i < 8; i++) {
+    const angle = (i * Math.PI) / 4 - Math.PI / 2;
+    const rad = i % 2 === 0 ? size : innerR;
+    const x = cx + Math.cos(angle) * rad;
+    const y = cy + Math.sin(angle) * rad;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+
+  ctx.fillStyle = `rgba(255, 255, 255, ${opacity.toFixed(3)})`;
+  ctx.shadowColor = `rgba(200, 230, 255, ${(opacity * 0.90).toFixed(3)})`;
+  ctx.shadowBlur = size * 2.2;
+  ctx.fill();
+
+  // Crisp central core dot for prominent stars
+  if (size > 3.2 && opacity > 0.25) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(1.3, size * 0.11), 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${opacity.toFixed(3)})`;
+    ctx.shadowBlur = 0;
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+/** Analyzes portrait alpha data: extracts smooth continuous outer silhouette contour & star matrix */
+function buildSilhouetteData(img: HTMLImageElement): SilhouetteData {
+  try {
+    const origW = img.naturalWidth || 1430;
+    const origH = img.naturalHeight || 1100;
+    const SW = 500;
+    const SH = Math.round((origH / origW) * SW);
+
+    const offscreen = document.createElement("canvas");
+    offscreen.width = SW;
+    offscreen.height = SH;
+    const ctx = offscreen.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return { stars: [], contourVertices: [] };
+
+    ctx.drawImage(img, 0, 0, SW, SH);
+    const { data } = ctx.getImageData(0, 0, SW, SH);
+
+    const ALPHA_THRESH = 35;
+
+    // 1. Trace outer left boundary & outer right boundary to avoid internal collar lines
+    const rawLeft: Array<{ x: number; y: number }> = [];
+    const rawRight: Array<{ x: number; y: number }> = [];
+
+    for (let sy = 0; sy < SH; sy += 2) {
+      // Leftmost edge (outer boundary)
+      for (let sx = 0; sx < Math.floor(SW / 2); sx++) {
+        const a = data[(sy * SW + sx) * 4 + 3];
+        if (a > ALPHA_THRESH) {
+          rawLeft.push({ x: sx, y: sy });
+          break;
+        }
+      }
+
+      // Rightmost edge (outer boundary)
+      for (let sx = SW - 1; sx >= Math.floor(SW / 2); sx--) {
+        const a = data[(sy * SW + sx) * 4 + 3];
+        if (a > ALPHA_THRESH) {
+          rawRight.push({ x: sx, y: sy });
+          break;
+        }
+      }
+    }
+
+    // 2. Apply moving-average smoothing along the contour to eliminate pixel staircasing
+    const smoothContour = (pts: Array<{ x: number; y: number }>, windowSize = 7) => {
+      const smoothed: Array<{ x: number; y: number }> = [];
+      const hw = Math.floor(windowSize / 2);
+      for (let i = 0; i < pts.length; i++) {
+        let sumX = 0;
+        let sumY = 0;
+        let count = 0;
+        for (let j = Math.max(0, i - hw); j <= Math.min(pts.length - 1, i + hw); j++) {
+          sumX += pts[j].x;
+          sumY += pts[j].y;
+          count++;
+        }
+        smoothed.push({ x: sumX / count, y: sumY / count });
+      }
+      return smoothed;
+    };
+
+    const smLeft = smoothContour(rawLeft, 7);
+    const smRight = smoothContour(rawRight, 7);
+
+    // Combine into unified ordered perimeter path: bottom-left -> top of head -> bottom-right
+    const fullContour: Array<{ x: number; y: number }> = [
+      ...smLeft.slice().reverse(),
+      ...smRight,
+    ];
+
+    const contourVertices: ContourVertex[] = fullContour.map(pt => ({
+      normX: pt.x / SW,
+      normY: pt.y / SH,
+      currentOpacity: 0,
+      targetOpacity: 0,
+    }));
+
+    // 3. Generate structured 4-point star matrix grid in the transparent field
+    const GRID_SPACING = 15; // More spaced out screen matrix for fewer, cleaner stars
+    const MAX_OUTWARD_DIST = 52; // Distance extent of star field
+    const stars: StarMatrixPoint[] = [];
+
+    for (let gy = 0; gy < SH; gy += GRID_SPACING) {
+      for (let gx = 0; gx < SW; gx += GRID_SPACING) {
+        const alpha = data[(gy * SW + gx) * 4 + 3];
+        if (alpha > ALPHA_THRESH) continue;
+
+        // Compute shortest distance to the smooth outer contour
+        let minD = 999999;
+        for (let i = 0; i < fullContour.length; i++) {
+          const dx = gx - fullContour[i].x;
+          const dy = gy - fullContour[i].y;
+          const d = dx * dx + dy * dy;
+          if (d < minD) {
+            minD = d;
+            if (minD < 4) break;
+          }
+        }
+
+        const dist = Math.sqrt(minD);
+        if (dist >= 0.5 && dist <= MAX_OUTWARD_DIST) {
+          const nd = dist / MAX_OUTWARD_DIST;
+          // Stars closest to edge are larger (~11.5px radius), tapering down to ~4.4px at outer edge
+          const baseSize = 11.5 * (1.0 - nd * 0.62);
+
+          stars.push({
+            normX: gx / SW,
+            normY: gy / SH,
+            baseSize,
+            currentOpacity: 0,
+            targetOpacity: 0,
+            fadeSpeed: 0.05 + Math.random() * 0.035,
+          });
+        }
+      }
+    }
+
+    return { stars, contourVertices };
+  } catch (err) {
+    console.error("[SilhouetteData] extraction failed:", err);
+    return { stars: [], contourVertices: [] };
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
    MAIN HERO COMPONENT
 ════════════════════════════════════════════════════════════ */
 export default function Hero({ cardBoxRefCallback }: HeroProps) {
@@ -181,7 +370,13 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
   const [ready, setReady] = useState(false);
 
   /* ── Refs ───────────────────────────────────────────────── */
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef   = useRef<HTMLElement>(null);
+
+  /* ── Silhouette particle & rim beam refs ─────────────────── */
+  const canvasRef      = useRef<HTMLCanvasElement | null>(null);
+  const portraitImgRef = useRef<HTMLImageElement | null>(null);
+  const silhouetteDataRef = useRef<SilhouetteData>({ stars: [], contourVertices: [] });
+  const mouseRef       = useRef<{ x: number; y: number; active: boolean }>({ x: -9999, y: -9999, active: false });
 
   /* ── Scroll-driven parallax ─────────────────────────────── */
   const { scrollYProgress } = useScroll({
@@ -197,12 +392,205 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
   const portraitYSpring = useSpring(portraitY, springCfg);
   const portraitScSpring = useSpring(portraitScale, springCfg);
 
-  /* ── Mount ──────────────────────────────────────────────── */
+  /* ── Silhouette Initialization on Mount ─────────────────── */
   useEffect(() => {
     const id = requestAnimationFrame(() => setReady(true));
+
+    if (!prefersReduced) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = "/potrait.png";
+      if (img.complete && img.naturalWidth > 0) {
+        silhouetteDataRef.current = buildSilhouetteData(img);
+      } else {
+        img.onload = () => {
+          silhouetteDataRef.current = buildSilhouetteData(img);
+        };
+      }
+    }
+
     return () => cancelAnimationFrame(id);
   }, []);
 
+  /* ── Desktop Window-Level Pointer Tracking ──────────────── */
+  useEffect(() => {
+    if (prefersReduced) return;
+    if (typeof window === "undefined" || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const onPointerMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
+    };
+
+    const onPointerLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999, active: false };
+    };
+
+    window.addEventListener("mousemove", onPointerMove, { passive: true });
+    window.addEventListener("mouseleave", onPointerLeave, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", onPointerMove);
+      window.removeEventListener("mouseleave", onPointerLeave);
+    };
+  }, [prefersReduced]);
+
+  /* ── Silhouette Canvas Animation Loop ───────────────────── */
+  useEffect(() => {
+    if (prefersReduced) return;
+    if (typeof window === "undefined" || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    let animId: number;
+
+    const tick = () => {
+      const canvas = canvasRef.current;
+      const imgEl  = portraitImgRef.current;
+
+      // Wait until elements are mounted with dimensions
+      if (!canvas || !imgEl || !imgEl.offsetWidth || !imgEl.offsetHeight) {
+        animId = requestAnimationFrame(tick);
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { animId = requestAnimationFrame(tick); return; }
+
+      const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = imgEl.getBoundingClientRect();
+
+      const BLEED = 80; // Generous bleed for star sparkles to radiate outward
+      const cssW = Math.round(rect.width + BLEED * 2);
+      const cssH = Math.round(rect.height + BLEED * 2);
+
+      // Keep canvas display style in sync with element
+      if (canvas.style.width !== `${cssW}px` || canvas.style.height !== `${cssH}px`) {
+        canvas.style.width  = `${cssW}px`;
+        canvas.style.height = `${cssH}px`;
+      }
+
+      // Keep internal pixel buffer in sync
+      const bufW = Math.round(cssW * dpr);
+      const bufH = Math.round(cssH * dpr);
+      if (canvas.width !== bufW || canvas.height !== bufH) {
+        canvas.width  = bufW;
+        canvas.height = bufH;
+      }
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      const mouse = mouseRef.current;
+      const { stars, contourVertices } = silhouetteDataRef.current;
+      const INFLUENCE = 190; // Reacting cursor radius in pixels
+
+      // Convert global cursor coordinates to canvas pixel space
+      const localMX = mouse.x - (rect.left - BLEED);
+      const localMY = mouse.y - (rect.top - BLEED);
+
+      // ──────────────────────────────────────────────────────────
+      // 1. DRAW SMOOTH, CONTINUOUS, LUMINOUS SILHOUETTE RIM BEAM
+      // ──────────────────────────────────────────────────────────
+      // Update contour vertex opacities based on proximity to cursor
+      for (let i = 0; i < contourVertices.length; i++) {
+        const v = contourVertices[i];
+        const vx = BLEED + v.normX * rect.width;
+        const vy = BLEED + v.normY * rect.height;
+
+        if (mouse.active) {
+          const dist = Math.hypot(vx - localMX, vy - localMY);
+          if (dist < INFLUENCE) {
+            const factor = 1 - dist / INFLUENCE;
+            v.targetOpacity = Math.pow(factor, 1.5) * 1.0;
+          } else {
+            v.targetOpacity = 0;
+          }
+        } else {
+          v.targetOpacity = 0;
+        }
+
+        v.currentOpacity += (v.targetOpacity - v.currentOpacity) * 0.10;
+      }
+
+      // Render continuous smooth contour path with glowing multi-pass stroke
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      // Pass A: Soft Outer Glow Bloom (Thick diffusion aura)
+      ctx.lineWidth = 10;
+      for (let i = 0; i < contourVertices.length - 1; i++) {
+        const v1 = contourVertices[i];
+        const v2 = contourVertices[i + 1];
+        const segOpacity = (v1.currentOpacity + v2.currentOpacity) / 2;
+
+        if (segOpacity > 0.01) {
+          ctx.beginPath();
+          ctx.moveTo(BLEED + v1.normX * rect.width, BLEED + v1.normY * rect.height);
+          ctx.lineTo(BLEED + v2.normX * rect.width, BLEED + v2.normY * rect.height);
+          ctx.strokeStyle = `rgba(180, 225, 255, ${(segOpacity * 0.40).toFixed(3)})`;
+          ctx.shadowColor = `rgba(160, 215, 255, ${(segOpacity * 0.95).toFixed(3)})`;
+          ctx.shadowBlur  = 16;
+          ctx.stroke();
+        }
+      }
+
+      // Pass B: Solid Continuous Bright Core Beam (Crisp smooth line)
+      ctx.lineWidth = 3.6;
+      for (let i = 0; i < contourVertices.length - 1; i++) {
+        const v1 = contourVertices[i];
+        const v2 = contourVertices[i + 1];
+        const segOpacity = (v1.currentOpacity + v2.currentOpacity) / 2;
+
+        if (segOpacity > 0.01) {
+          ctx.beginPath();
+          ctx.moveTo(BLEED + v1.normX * rect.width, BLEED + v1.normY * rect.height);
+          ctx.lineTo(BLEED + v2.normX * rect.width, BLEED + v2.normY * rect.height);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${(segOpacity * 0.98).toFixed(3)})`;
+          ctx.shadowColor = `#ffffff`;
+          ctx.shadowBlur  = 8;
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // ──────────────────────────────────────────────────────────
+      // 2. DRAW 4-POINT STAR SPARKLE MATRIX AURA (✦)
+      // ──────────────────────────────────────────────────────────
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
+        const sx = BLEED + star.normX * rect.width;
+        const sy = BLEED + star.normY * rect.height;
+
+        if (mouse.active) {
+          const dist = Math.hypot(sx - localMX, sy - localMY);
+          if (dist < INFLUENCE) {
+            const factor = 1 - dist / INFLUENCE;
+            // Radial cubic falloff from cursor
+            const cursorStrength = Math.pow(factor, 2.0);
+            star.targetOpacity = cursorStrength * 0.95;
+          } else {
+            star.targetOpacity = 0;
+          }
+        } else {
+          star.targetOpacity = 0;
+        }
+
+        // Smooth trailing interpolation
+        star.currentOpacity += (star.targetOpacity - star.currentOpacity) * star.fadeSpeed;
+
+        if (star.currentOpacity > 0.008) {
+          // Dynamic star scale based on current activation brightness
+          const dynamicSize = star.baseSize * (0.35 + 0.65 * star.currentOpacity);
+          draw4PointStar(ctx, sx, sy, dynamicSize, star.currentOpacity);
+        }
+      }
+
+      ctx.restore();
+      animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
+  }, [prefersReduced]);
   return (
     <>
       <div style={{ overflowX: "hidden", position: "relative" }}>
@@ -217,7 +605,6 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             background: "rgba(0, 0, 0, 1)",
           }}
         >
-
 
           {/* ── Portrait — absolute, centered, large ── */}
           <motion.div
@@ -237,8 +624,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             }}
             ref={cardBoxRefCallback}
           >
-
-            {/* Entrance animation — on top of glow */}
+            {/* Entrance animation */}
             <motion.div
               {...(ready && !prefersReduced
                 ? {
@@ -248,11 +634,34 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                 }
                 : {}
               )}
-              style={{ width: "100%", position: "relative", zIndex: 2 }}
+              style={{ width: "100%", position: "relative" }}
             >
+              {/* Canvas star matrix & rim beam layer */}
+              {!prefersReduced && (
+                <canvas
+                  ref={canvasRef}
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: "-80px",
+                    left: "-80px",
+                    pointerEvents: "none",
+                    zIndex: 3,
+                  }}
+                />
+              )}
+
               <img
+                ref={portraitImgRef}
                 src="/potrait.png"
                 alt={`${NAME} — ${ROLE}`}
+                crossOrigin="anonymous"
+                onLoad={e => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  if (silhouetteDataRef.current.stars.length === 0) {
+                    silhouetteDataRef.current = buildSilhouetteData(img);
+                  }
+                }}
                 style={{
                   width: "100%",
                   height: "auto",
@@ -261,6 +670,8 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                   objectPosition: "center top",
                   filter: "contrast(1.08) brightness(0.92)",
                   userSelect: "none",
+                  position: "relative",
+                  zIndex: 2,
                   /* Fade out at bottom only */
                   WebkitMaskImage: `linear-gradient(
                     to bottom,

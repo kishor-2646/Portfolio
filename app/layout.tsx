@@ -46,6 +46,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${outfit.variable} ${instrumentSerif.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@400;500;600&family=Great+Vibes&family=Marck+Script&family=Sacramento&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${outfit.className} antialiased`}>
         {children}
       </body>

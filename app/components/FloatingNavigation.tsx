@@ -21,7 +21,6 @@ import { Menu, X } from "lucide-react";
 const NAV_ITEMS = [
   { id: "about",    label: "About"   },
   { id: "projects", label: "Work"    },
-  { id: "skills",   label: "Skills"  },
   { id: "journey",  label: "Journey" },
   { id: "contact",  label: "Contact" },
 ];

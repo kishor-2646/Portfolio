@@ -6,14 +6,13 @@ import FloatingNavigation  from './components/FloatingNavigation';
 import Footer              from './components/Footer';
 import Hero                from './components/Hero';
 import AboutSection        from './components/AboutSection';
-import SkillsSection       from './components/SkillsSection';
 import ProjectsSection     from './components/ProjectsSection';
 import JourneySection      from './components/JourneySection';
 import Contact             from './components/Contact';
 import ScrollProgressBar   from './components/ScrollProgressBar';
 
 /* ── Section IDs (for nav + IntersectionObserver) ─────────────────────────── */
-const SECTION_IDS = ['hero', 'about', 'skills', 'projects', 'journey', 'contact'];
+const SECTION_IDS = ['hero', 'about', 'projects', 'journey', 'contact'];
 
 export default function App() {
   const [activeSection, setActiveSection]   = useState('hero');
@@ -76,12 +75,9 @@ export default function App() {
 
         {/* Remaining sections */}
         <AboutSection />
-        <div className="relative" style={{ zIndex: 10 }}>
-          <SkillsSection />
-          <ProjectsSection />
-          <JourneySection />
-          <Contact />
-        </div>
+        <ProjectsSection />
+        <JourneySection />
+        <Contact />
       </main>
 
       <Footer />
