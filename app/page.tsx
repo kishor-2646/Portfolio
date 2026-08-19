@@ -2,17 +2,19 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-import FloatingNavigation  from './components/FloatingNavigation';
-import Footer              from './components/Footer';
-import Hero                from './components/Hero';
-import AboutSection        from './components/AboutSection';
-import ProjectsSection     from './components/ProjectsSection';
-import JourneySection      from './components/JourneySection';
-import Contact             from './components/Contact';
-import ScrollProgressBar   from './components/ScrollProgressBar';
+import FloatingNavigation   from './components/FloatingNavigation';
+import Footer               from './components/Footer';
+import Hero                 from './components/Hero';
+import AboutSection         from './components/AboutSection';
+import ProjectsSection      from './components/ProjectsSection';
+import JourneySection       from './components/JourneySection';
+import AchievementsSection  from './components/AchievementsSection';
+import BlogsSection         from './components/BlogsSection';
+import Contact              from './components/Contact';
+import ScrollProgressBar    from './components/ScrollProgressBar';
 
 /* ── Section IDs (for nav + IntersectionObserver) ─────────────────────────── */
-const SECTION_IDS = ['hero', 'about', 'projects', 'journey', 'contact'];
+const SECTION_IDS = ['hero', 'about', 'projects', 'journey', 'achievements', 'blogs', 'contact'];
 
 export default function App() {
   const [activeSection, setActiveSection]   = useState('hero');
@@ -37,26 +39,32 @@ export default function App() {
     return () => clearTimeout(t);
   }, [navClickTarget]);
 
-  /* ── IntersectionObserver — keep activeSection in sync ───────────────── */
+  /* ── Dynamic Active Section Scroll Tracker ───────────────────────────── */
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    const handleScroll = () => {
+      if (isScrollingRef.current) return;
 
-    SECTION_IDS.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
+      // Check current scroll position relative to viewport
+      const scrollPosition = window.scrollY + window.innerHeight * 0.35;
 
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (isScrollingRef.current) return;
-          if (entry.isIntersecting) setActiveSection(id);
-        },
-        { threshold: 0.25, rootMargin: '-80px 0px 0px 0px' }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
+      // Find the active section from bottom to top
+      for (let i = SECTION_IDS.length - 1; i >= 0; i--) {
+        const id = SECTION_IDS[i];
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+    };
 
-    return () => observers.forEach(obs => obs.disconnect());
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check on mount
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -77,6 +85,8 @@ export default function App() {
         <AboutSection />
         <ProjectsSection />
         <JourneySection />
+        <AchievementsSection />
+        <BlogsSection />
         <Contact />
       </main>
 

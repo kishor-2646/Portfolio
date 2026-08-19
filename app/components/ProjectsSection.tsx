@@ -3,26 +3,62 @@
 import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
-import { ExternalLink, Github, ArrowUpRight, Trophy, Sparkles } from 'lucide-react';
+import { ExternalLink, Github, ArrowUpRight, Sparkles } from 'lucide-react';
 import { PROJECTS } from '../lib/data';
 
 /* ─────────────────────────────────────────────────────────────
-   CATEGORY LABELS
+   PROJECT METADATA
 ───────────────────────────────────────────────────────────── */
-const CATEGORY_MAP: Record<string, string> = {
-  'greenwave':       'Smart Traffic & Emergency Response',
-  'truck-singh':     'Logistics & Fleet Automation',
-  'pcify':           'AI Marketplace & Configurator',
-  'retailer-sakthi': 'B2B Medicine Distribution',
+const PROJECT_META: Record<
+  string,
+  {
+    category: string;
+    cleanTitle: string;
+    cleanDescription: string;
+    role: string;
+    badge: string;
+  }
+> = {
+  'greenwave': {
+    category: 'Emergency Traffic AI',
+    cleanTitle: 'GreenWave — Smart Ambulance Traffic System',
+    cleanDescription: 'Real-time GPS tracking and automated traffic signal automation system creating green corridors in high-traffic zones.',
+    role: 'Role: Sole Developer',
+    badge: 'Winner — BFB Hackathon',
+  },
+  'truck-singh': {
+    category: 'Logistics Automation',
+    cleanTitle: 'Truck Singh — Logistics Platform',
+    cleanDescription: 'Full-stack logistics management platform serving 100+ active users across drivers, agents, and fleet owners.',
+    role: 'Role: Team Lead',
+    badge: 'UptoSkills Sprint',
+  },
+  'pcify': {
+    category: 'Marketplace Engine',
+    cleanTitle: 'PCify — AI-Based PC Builder Marketplace',
+    cleanDescription: 'Two-sided marketplace connecting users with expert custom PC builders, powered by an AI recommendation engine.',
+    role: 'Role: Full Stack Developer',
+    badge: 'In Progress',
+  },
+  'retailer-sakthi': {
+    category: 'Healthcare B2B',
+    cleanTitle: 'Retailer Sakthi — B2B Medicine Platform',
+    cleanDescription: 'Led a 12-member engineering team to deliver a digital medicine distribution and bulk ordering marketplace MVP in 15 days.',
+    role: 'Role: Team Lead (12 Members)',
+    badge: 'Hackathon MVP',
+  },
 };
 
 /* ─────────────────────────────────────────────────────────────
-   CLEAN MINIMAL STICKY STACK CARD
-   Matching reference image:
-   - NO card border
-   - NO glowing ambient light inside card
-   - Clean media showcase on top
-   - Editorial headline, description, tags & pill CTA buttons below
+   MINIMAL CLASSIC STACK CARD (MATCHING REFERENCE IMAGE)
+   - Left side:
+       1. Category with small dot/icon
+       2. Clean Medium/Semibold Title (32-38px)
+       3. 2-line concise description (16-17px)
+       4. Meta row: Role + Pill Badge
+       5. Clean Pill Action Buttons (View case study, Code/Demo)
+   - Right side: Clean, large rounded media showcase
+   - Borderless, zero interior glow, smooth receding scroll stack
 ───────────────────────────────────────────────────────────── */
 interface StackCardProps {
   project: typeof PROJECTS[0];
@@ -39,7 +75,14 @@ function StackCard({
   progress,
   onClick,
 }: StackCardProps) {
-  const category = CATEGORY_MAP[project.slug] ?? 'Production System';
+  const meta = PROJECT_META[project.slug] ?? {
+    category: 'Production System',
+    cleanTitle: project.title,
+    cleanDescription: project.description,
+    role: 'Role: Developer',
+    badge: 'Completed',
+  };
+
   const hasImage = Boolean(project.image);
   const isLast = index === total - 1;
 
@@ -83,7 +126,7 @@ function StackCard({
       className="stack-card relative w-full"
       style={{
         position: 'sticky',
-        top: '64px',
+        top: '76px',
         zIndex: 10 + index,
         marginBottom: isLast ? '0px' : 'clamp(460px, 62vh, 720px)',
       }}
@@ -91,13 +134,13 @@ function StackCard({
       <style>{`
         @media (max-width: 768px) {
           .stack-card:nth-child(${index + 1}) {
-            top: 56px !important;
+            top: 70px !important;
             margin-bottom: ${isLast ? '0px' : '360px'} !important;
           }
         }
       `}</style>
 
-      {/* Clean Borderless Project Panel Container */}
+      {/* Clean Borderless Project Panel — Exact #000000 matching page */}
       <motion.div
         style={{
           scale,
@@ -106,116 +149,109 @@ function StackCard({
           transformOrigin: 'top center',
           filter: useTransform(brightness, b => `brightness(${b})`),
           background: '#000000',
-          boxShadow: '0 30px 90px rgba(0, 0, 0, 0.95)',
           willChange: 'transform, opacity, filter',
         }}
         onClick={onClick}
         className="
           group relative cursor-pointer
-          w-full rounded-[28px] sm:rounded-[36px]
-          p-4 sm:p-6 md:p-8 lg:p-10
+          w-full rounded-[28px] sm:rounded-[36px] md:rounded-[42px]
+          p-6 sm:p-8 md:p-10 lg:p-12 xl:p-14
           overflow-hidden
           transition-all duration-300
         "
       >
-        {/* ── TOP SECTION: Large Clean Media Showcase Frame ── */}
-        <div className="relative w-full aspect-[16/9] sm:aspect-[16/8.5] md:aspect-[16/8] rounded-[20px] sm:rounded-[28px] overflow-hidden bg-[#0a0a0a] border border-white/10 shadow-2xl mb-6 sm:mb-8">
-          {hasImage ? (
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-white/5">
-              <span className="text-white/30 text-sm font-semibold uppercase tracking-wider">
-                Preview Coming Soon
-              </span>
-            </div>
-          )}
-
-          {/* Featured pill badge */}
-          {project.isFeatured && (
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3.5 py-1.5 bg-black/75 border border-white/20 rounded-full backdrop-blur-md">
-              <Trophy size={12} className="text-amber-400" />
-              <span className="text-[11px] font-bold text-white uppercase tracking-widest">
-                Featured
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* ── BOTTOM SECTION: Clean Minimal Editorial Typography & Actions ── */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 px-2 sm:px-3">
+        {/* 2-Column Split Grid: Left Details (5 cols) | Right Media (7 cols - 25% larger) */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-end">
           
-          {/* Left Block: Category, Title, Subtitle, Tags */}
-          <div className="max-w-3xl space-y-3">
-            {/* Category / Brand indicator */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 font-medium tracking-wide">
-              <span className="inline-block w-2 h-2 rounded-full bg-white/80" />
-              <span>{category}</span>
+          {/* ── LEFT COLUMN: Minimal Classic Typography (Aligned to Bottom) ── */}
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-end space-y-4 pb-1 sm:pb-2">
+            
+            {/* 1. Category / Brand line */}
+            <div className="flex items-center gap-2 text-xs sm:text-[13px] text-white/70 font-medium tracking-wide">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/80" />
+              <span>{meta.category}</span>
             </div>
 
-            {/* Main Headline */}
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight leading-[1.15] group-hover:text-white transition-colors">
-              {project.title}
+            {/* 2. Main Headline */}
+            <h3 className="text-2xl sm:text-3xl md:text-[2.05rem] lg:text-[2.15rem] font-semibold text-white tracking-[-0.02em] leading-[1.18] group-hover:text-white transition-colors">
+              {meta.cleanTitle}
             </h3>
 
-            {/* Short Impact Description */}
-            <p className="text-sm sm:text-base text-white/65 font-light leading-relaxed max-w-2xl">
-              {project.description}
+            {/* 3. Concise 2-Line Description */}
+            <p className="text-sm sm:text-[15px] text-white/65 font-normal leading-relaxed max-w-lg">
+              {meta.cleanDescription}
             </p>
 
-            {/* Meta Tags Row */}
-            <div className="flex flex-wrap items-center gap-2 pt-2">
-              {project.tags.slice(0, 4).map(tag => (
-                <span
-                  key={tag}
-                  className="text-[11px] sm:text-xs px-3 py-1 rounded-full uppercase font-medium tracking-wide bg-white/[0.08] border border-white/12 text-white/75"
+            {/* 4. Meta Row: Role & Pill Badge */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
+              <span className="text-[13px] text-white/50 font-normal">
+                {meta.role}
+              </span>
+              <span className="text-[11px] px-3 py-0.5 rounded-full bg-white/[0.08] text-white/85 border border-white/12 font-medium">
+                {meta.badge}
+              </span>
+            </div>
+
+            {/* 5. Clean Pill Action Buttons (Matching Reference Image) */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              <button
+                onClick={onClick}
+                className="inline-flex items-center gap-2 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40"
+              >
+                <span>View case study</span>
+              </button>
+
+              {project.live ? (
+                <a
+                  href={project.live}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent"
+                  title="Try Live Demo"
                 >
-                  {tag}
-                </span>
-              ))}
+                  <span>Try Demo</span>
+                  <ArrowUpRight size={14} />
+                </a>
+              ) : project.github ? (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent"
+                  title="View Source Code"
+                >
+                  <Github size={14} />
+                  <span>Code</span>
+                </a>
+              ) : null}
+            </div>
+
+          </div>
+
+          {/* ── RIGHT COLUMN: Clean Media Preview (~25% Larger) ── */}
+          <div className="lg:col-span-7 xl:col-span-7 w-full flex items-center justify-center">
+            <div className="relative w-full aspect-[1.32] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-black/60 min-h-[300px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[480px] xl:min-h-[520px]">
+              {hasImage ? (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/5">
+                  <span className="text-white/30 text-sm font-semibold uppercase tracking-wider">
+                    Preview Coming Soon
+                  </span>
+                </div>
+              )}
+              {/* Subtle gradient vignette */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
 
-          {/* Right Block: Clean Pill Action Buttons (Matching Reference) */}
-          <div className="flex items-center gap-3 shrink-0 pt-2 lg:pt-0">
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all text-white/80 border border-white/25 hover:border-white/50 hover:text-white bg-white/5 backdrop-blur-sm"
-                title="View Source Code"
-              >
-                <Github size={15} /> Code
-              </a>
-            )}
-
-            {project.live && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all text-white/80 border border-white/25 hover:border-white/50 hover:text-white bg-white/5 backdrop-blur-sm"
-                title="View Live Demo"
-              >
-                <ExternalLink size={15} /> Live Demo
-              </a>
-            )}
-
-            <button
-              onClick={onClick}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-6 py-2.5 rounded-full transition-all text-black bg-white hover:bg-white/90 shadow-md"
-            >
-              <span>View Case Study</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
 
         </div>
       </motion.div>
@@ -236,6 +272,12 @@ export default function ProjectsSection() {
     offset: ['start start', 'end end'],
   });
 
+  // Simultaneous smooth exit transition: when the last card completes scrolling,
+  // all cards on screen fade out together seamlessly into the next section
+  const stackExitOpacity = useTransform(scrollYProgress, [0.86, 0.96], [1, 0]);
+  const stackExitScale = useTransform(scrollYProgress, [0.86, 0.96], [1, 0.97]);
+  const stackExitY = useTransform(scrollYProgress, [0.86, 0.96], [0, -18]);
+
   return (
     <section
       id="projects"
@@ -244,7 +286,7 @@ export default function ProjectsSection() {
       style={{ background: '#000000' }}
     >
       {/* Section Heading Container */}
-      <div className="w-[96%] max-w-[1560px] mx-auto px-3 sm:px-6 md:px-8 mb-12 sm:mb-16">
+      <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 mb-12 sm:mb-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -267,8 +309,17 @@ export default function ProjectsSection() {
         </motion.div>
       </div>
 
-      {/* Stacking Cards List — Clean & Borderless */}
-      <div className="w-[96%] max-w-[1560px] mx-auto px-3 sm:px-6 md:px-8 relative overflow-visible">
+      {/* Stacking Cards List — Simultaneous Smooth Fade-Out Exit */}
+      <motion.div
+        style={{
+          opacity: stackExitOpacity,
+          scale: stackExitScale,
+          y: stackExitY,
+          transformOrigin: 'center top',
+          willChange: 'opacity, transform',
+        }}
+        className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 relative overflow-visible"
+      >
         {PROJECTS.map((project, index) => (
           <StackCard
             key={project.slug}
@@ -283,18 +334,104 @@ export default function ProjectsSection() {
         {/* Bottom Runway Spacer */}
         <div
           className="w-full pointer-events-none"
-          style={{ height: 'clamp(320px, 48vh, 560px)' }}
+          style={{ height: 'clamp(340px, 50vh, 580px)' }}
           aria-hidden="true"
         />
+      </motion.div>
+
+      {/* ── FUN AND LEARNING PROJECTS (Matching Reference Image) ── */}
+      <div className="w-[96%] max-w-5xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-12">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-12 sm:mb-16"
+        >
+          <h3 className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-white font-normal tracking-tight">
+            Fun and Learning Projects
+          </h3>
+          <p className="text-sm sm:text-base text-white/50 mt-2.5 font-light">
+            Projects created out of curiosity
+          </p>
+        </motion.div>
+
+        {/* 2-Card Grid (Matching Reference Design) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          
+          {/* Card 1: Cargo Flow */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="group cursor-pointer flex flex-col justify-between"
+          >
+            <div>
+              <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
+                <img
+                  src="/projects/greenwave.png"
+                  alt="Cargo Flow"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
+                Cargo Flow
+              </h4>
+              <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
+                An AI driven Cargo web app to manage shipments and communication
+              </p>
+            </div>
+            <div className="mt-4">
+              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all">
+                View case study
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Card 2: Rewake */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="group cursor-pointer flex flex-col justify-between"
+          >
+            <div>
+              <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
+                <img
+                  src="/projects/PCify.png"
+                  alt="Rewake"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
+                Rewake
+              </h4>
+              <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
+                A gamified app that turns your wake-up into a win
+              </p>
+            </div>
+            <div className="mt-4">
+              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all">
+                View case study
+              </button>
+            </div>
+          </motion.div>
+
+        </div>
       </div>
 
       {/* View All CTA on GitHub */}
-      <div className="w-[96%] max-w-[1560px] mx-auto px-3 sm:px-6 md:px-8 pt-6 pb-16 text-center">
+      <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 pt-6 pb-16 text-center">
         <motion.a
           href="https://github.com/kishor-2646"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full border border-white/20 text-white/80 font-semibold text-sm bg-white/[0.04] transition-all duration-300 hover:border-white/40 hover:text-white hover:bg-white/[0.08]"
+          className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full border border-white/15 text-white/75 font-semibold text-sm bg-white/[0.04] transition-all duration-300 hover:border-white/35 hover:text-white hover:bg-white/[0.08]"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
