@@ -204,20 +204,40 @@ export default function JourneySection() {
         {/* Viewport Content Wrapper */}
         <div className="relative w-full h-full flex flex-col justify-between pt-16 pb-12 px-6 lg:px-12 select-none">
           
-          {/* Section Header */}
+          {/* Section Header with Masked Title Reveal */}
           <div className="max-w-4xl mx-auto text-center z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-semibold tracking-[0.2em] uppercase mb-3">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1.0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-semibold tracking-[0.2em] uppercase mb-3"
+            >
               <span className="text-cyan-400">✦</span>
               <span>EXPERIENCE</span>
+            </motion.div>
+
+            <div className="overflow-hidden">
+              <motion.h2
+                initial={{ y: "115%", opacity: 0 }}
+                whileInView={{ y: "0%", opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.75, delay: 0.08, ease: [0.16, 1.0, 0.3, 1] }}
+                className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight"
+              >
+                the journey so far
+              </motion.h2>
             </div>
 
-            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              the journey so far
-            </h2>
-
-            <p className="text-sm lg:text-base text-white/50 font-light mt-2 max-w-xl mx-auto leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="text-sm lg:text-base text-white/50 font-light mt-2 max-w-xl mx-auto leading-relaxed"
+            >
               From hackathon wins to production logistics systems — engineering roles and milestones across my journey.
-            </p>
+            </motion.p>
           </div>
 
           {/* Horizontal Timeline Track Canvas */}

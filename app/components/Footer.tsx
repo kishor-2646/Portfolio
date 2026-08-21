@@ -1,7 +1,9 @@
 "use client";
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import portfolioConfig from '../../portfolio.config';
+import { ease, dur } from '../lib/motion';
 
 /* ─────────────────────────────────────────────────────────────
    MINIMALIST CLASSIC FOOTER (MATCHING REFERENCE IMAGE)
@@ -12,7 +14,13 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full py-12 pb-16 bg-black text-white/50 text-center select-none border-t border-white/[0.06]">
+    <motion.footer
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, ease: ease.out }}
+      className="w-full py-12 pb-16 bg-black text-white/50 text-center select-none border-t border-white/[0.06]"
+    >
       <div className="max-w-4xl mx-auto px-4 space-y-3">
         
         {/* Vibe-coded statement with subtle tech badges */}
@@ -33,6 +41,6 @@ export default function Footer() {
         </p>
 
       </div>
-    </footer>
+    </motion.footer>
   );
 }

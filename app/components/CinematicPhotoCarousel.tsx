@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import portfolioConfig from '../../portfolio.config';
 
 interface Slide {
   id: string;
@@ -12,7 +13,7 @@ interface Slide {
   subtitle: string;
 }
 
-const PHOTOS: Slide[] = [
+const DEFAULT_PHOTOS: Slide[] = [
   {
     id: "medsakthi",
     src: "/projects/MedSakthi.png",
@@ -47,13 +48,15 @@ const PHOTOS: Slide[] = [
   },
   {
     id: "profile",
-    src: "/photo.jpeg",
+    src: "/potrait.png",
     alt: "Kishor Kumar Engineering Milestone",
     tag: "Production Impact",
     title: "Production-Grade Engineering",
     subtitle: "Built systems for 100+ live users with 60%+ communication efficiency.",
   },
 ];
+
+const PHOTOS: Slide[] = portfolioConfig.about?.carouselSlides || DEFAULT_PHOTOS;
 
 const AUTOPLAY_INTERVAL = 3800;
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { ExternalLink, Github, ArrowUpRight, Sparkles } from 'lucide-react';
 import { PROJECTS } from '../lib/data';
+import { ease, dur } from '../lib/motion';
 
 /* ─────────────────────────────────────────────────────────────
    PROJECT METADATA
@@ -51,14 +52,6 @@ const PROJECT_META: Record<
 
 /* ─────────────────────────────────────────────────────────────
    MINIMAL CLASSIC STACK CARD (MATCHING REFERENCE IMAGE)
-   - Left side:
-       1. Category with small dot/icon
-       2. Clean Medium/Semibold Title (32-38px)
-       3. 2-line concise description (16-17px)
-       4. Meta row: Role + Pill Badge
-       5. Clean Pill Action Buttons (View case study, Code/Demo)
-   - Right side: Clean, large rounded media showcase
-   - Borderless, zero interior glow, smooth receding scroll stack
 ───────────────────────────────────────────────────────────── */
 interface StackCardProps {
   project: typeof PROJECTS[0];
@@ -160,7 +153,7 @@ function StackCard({
           transition-all duration-300
         "
       >
-        {/* 2-Column Split Grid: Left Details (5 cols) | Right Media (7 cols - 25% larger) */}
+        {/* 2-Column Split Grid: Left Details (5 cols) | Right Media (7 cols) */}
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-end">
           
           {/* ── LEFT COLUMN: Minimal Classic Typography (Aligned to Bottom) ── */}
@@ -192,11 +185,11 @@ function StackCard({
               </span>
             </div>
 
-            {/* 5. Clean Pill Action Buttons (Matching Reference Image) */}
+            {/* 5. Clean Pill Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
               <button
                 onClick={onClick}
-                className="inline-flex items-center gap-2 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40"
+                className="inline-flex items-center gap-2 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 active:scale-95"
               >
                 <span>View case study</span>
               </button>
@@ -207,7 +200,7 @@ function StackCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent active:scale-95"
                   title="Try Live Demo"
                 >
                   <span>Try Demo</span>
@@ -219,7 +212,7 @@ function StackCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-white/85 border border-white/20 hover:border-white/40 hover:text-white bg-transparent active:scale-95"
                   title="View Source Code"
                 >
                   <Github size={14} />
@@ -251,7 +244,6 @@ function StackCard({
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
-
 
         </div>
       </motion.div>
@@ -285,28 +277,42 @@ export default function ProjectsSection() {
       className="relative w-full text-white pt-24 sm:pt-32 pb-20 overflow-visible"
       style={{ background: '#000000' }}
     >
-      {/* Section Heading Container */}
+      {/* Section Heading Container with Masked Title Reveal */}
       <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 mb-12 sm:mb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-3"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase">
+        <div className="space-y-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1.0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: ease.out }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase"
+          >
             <Sparkles size={13} className="text-white/70" />
             Featured Work
+          </motion.div>
+
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: "115%", opacity: 0 }}
+              whileInView={{ y: "0%", opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.75, delay: 0.08, ease: ease.cinematic }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight"
+            >
+              Selected Projects
+            </motion.h2>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight">
-            Selected Projects
-          </h2>
-
-          <p className="max-w-2xl text-base sm:text-lg text-white/60 leading-relaxed font-light">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.2, ease: ease.out }}
+            className="max-w-2xl text-base sm:text-lg text-white/60 leading-relaxed font-light"
+          >
             Production-grade systems, real-time architectures, and hackathon-winning solutions built under real-world constraints.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
       </div>
 
       {/* Stacking Cards List — Simultaneous Smooth Fade-Out Exit */}
@@ -341,31 +347,41 @@ export default function ProjectsSection() {
 
       {/* ── FUN AND LEARNING PROJECTS (Matching Reference Image) ── */}
       <div className="w-[96%] max-w-5xl mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-12">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-12 sm:mb-16"
-        >
-          <h3 className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-white font-normal tracking-tight">
-            Fun and Learning Projects
-          </h3>
-          <p className="text-sm sm:text-base text-white/50 mt-2.5 font-light">
+        {/* Section Header with Masked Title Reveal */}
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="overflow-hidden">
+            <motion.h3
+              initial={{ y: "115%", opacity: 0 }}
+              whileInView={{ y: "0%", opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.75, ease: ease.cinematic }}
+              className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-white font-normal tracking-tight"
+            >
+              Fun and Learning Projects
+            </motion.h3>
+          </div>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
+            className="text-sm sm:text-base text-white/50 mt-2.5 font-light"
+          >
             Projects created out of curiosity
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
-        {/* 2-Card Grid (Matching Reference Design) */}
+        {/* 2-Card Grid with Staggered Entrance */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           
           {/* Card 1: Cargo Flow */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.65, delay: 0.1, ease: ease.out }}
+            whileHover={{ y: -4 }}
             className="group cursor-pointer flex flex-col justify-between"
           >
             <div>
@@ -385,60 +401,45 @@ export default function ProjectsSection() {
               </p>
             </div>
             <div className="mt-4">
-              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all">
+              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all active:scale-95">
                 View case study
               </button>
             </div>
           </motion.div>
 
-          {/* Card 2: Rewake */}
+          {/* Card 2: PCify Learning */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.65, delay: 0.22, ease: ease.out }}
+            whileHover={{ y: -4 }}
             className="group cursor-pointer flex flex-col justify-between"
           >
             <div>
               <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
                 <img
-                  src="/projects/PCify.png"
-                  alt="Rewake"
+                  src="/projects/pcify.png"
+                  alt="PCify Architecture"
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   loading="lazy"
                 />
               </div>
               <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
-                Rewake
+                PCify Architecture Lab
               </h4>
               <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
-                A gamified app that turns your wake-up into a win
+                Experimental AI component compatibility engine and automated benchmark evaluator
               </p>
             </div>
             <div className="mt-4">
-              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all">
+              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all active:scale-95">
                 View case study
               </button>
             </div>
           </motion.div>
 
         </div>
-      </div>
-
-      {/* View All CTA on GitHub */}
-      <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 pt-6 pb-16 text-center">
-        <motion.a
-          href="https://github.com/kishor-2646"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full border border-white/15 text-white/75 font-semibold text-sm bg-white/[0.04] transition-all duration-300 hover:border-white/35 hover:text-white hover:bg-white/[0.08]"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          View all repositories on GitHub <ExternalLink size={15} />
-        </motion.a>
       </div>
     </section>
   );

@@ -162,6 +162,61 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────
+   REUSABLE SPECULAR RIM LIGHT / BORDER BEAM EFFECT
+   - Subtle moving white/metallic highlight travelling along edge
+   - Masked conic-gradient with narrow soft specular beam (15-25deg)
+───────────────────────────────────────────────────────── */
+@keyframes spinBeam {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rim-light,
+.border-beam {
+  position: relative !important;
+  isolation: isolate;
+}
+
+.rim-light::before,
+.border-beam::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -1px !important;
+  border-radius: inherit !important;
+  padding: 1.5px !important;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg,
+    transparent 280deg,
+    rgba(255, 255, 255, 0.05) 310deg,
+    rgba(255, 255, 255, 0.35) 330deg,
+    rgba(255, 255, 255, 0.95) 345deg,
+    rgba(255, 255, 255, 0.35) 355deg,
+    transparent 360deg
+  ) !important;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  pointer-events: none !important;
+  animation: borderBeamRotate 9s linear infinite !important;
+  z-index: 2 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rim-light::before,
+  .border-beam::before {
+    animation: none !important;
+    opacity: 0.4 !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
    REDUCED MOTION
    Disables all meaningful animations while preserving layout.
 ───────────────────────────────────────────────────────── */

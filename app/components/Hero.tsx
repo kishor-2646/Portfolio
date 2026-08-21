@@ -18,9 +18,11 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useMotionValue,
 } from "framer-motion";
-import { NAME, ROLE } from "../lib/data";
+import { NAME, ROLE, ROTATING_TAGLINES, PROFILE_IMAGE, HERO_UI } from "../lib/data";
 import { ease } from "../lib/motion";
+import SpecularRimBeam from "./SpecularRimBeam";
 
 /* ── Bezier tuple type ───────────────────────────────────── */
 type Bezier = [number, number, number, number];
@@ -31,9 +33,9 @@ const easeSnap: Bezier = [0.76, 0, 0.24, 1];
 /* ── Identity ───────────────────────────────────────────── */
 const firstName = NAME.split(" ")[0]; // "Kishor"
 
-/* ── Rotating taglines ──────────────────────────────────── */
-const TAGLINES = [
-  ROLE,                       // "Software Engineer"
+/* ── Rotating taglines from portfolio.config.ts ─────────── */
+const TAGLINES = ROTATING_TAGLINES || [
+  ROLE,
   "Full-Stack Developer",
   "Mobile App Developer",
   "Problem Solver",
@@ -399,7 +401,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
     if (!prefersReduced) {
       const img = new Image();
       img.crossOrigin = "anonymous";
-      img.src = "/potrait.png";
+      img.src = PROFILE_IMAGE || "/potrait.png";
       if (img.complete && img.naturalWidth > 0) {
         silhouetteDataRef.current = buildSilhouetteData(img);
       } else {
@@ -410,9 +412,9 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
     }
 
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [prefersReduced]);
 
-  /* ── Desktop Window-Level Pointer Tracking ──────────────── */
+  /* ── Desktop Window-Level Pointer Tracking (For Silhouette Star Matrix) ── */
   useEffect(() => {
     if (prefersReduced) return;
     if (typeof window === "undefined" || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
@@ -606,6 +608,14 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
           }}
         >
 
+          {/* ── Subtle Ambient Atmosphere Glow (fades in smoothly) ── */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={ready && !prefersReduced ? { opacity: 1 } : { opacity: 1 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-b from-white/[0.03] to-transparent rounded-full blur-[140px] pointer-events-none z-[1]"
+          />
+
           {/* ── Portrait — absolute, centered, large ── */}
           <motion.div
             style={{
@@ -624,38 +634,36 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             }}
             ref={cardBoxRefCallback}
           >
-            {/* Entrance animation */}
+            {/* Stage 4 / Layer 1: Background Radial Glow (fades & expands softly after photo starts revealing) */}
             <motion.div
-              {...(ready && !prefersReduced
-                ? {
-                  initial: { opacity: 0, y: 60, scale: 1.04 },
-                  animate: { opacity: 1, y: 0, scale: 1 },
-                  transition: { duration: 1.3, delay: T.portrait, ease: [0.16, 1, 0.3, 1] as Bezier },
-                }
-                : {}
-              )}
-              style={{ width: "100%", position: "relative" }}
-            >
-              {/* Canvas star matrix & rim beam layer */}
-              {!prefersReduced && (
-                <canvas
-                  ref={canvasRef}
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    top: "-80px",
-                    left: "-80px",
-                    pointerEvents: "none",
-                    zIndex: 3,
-                  }}
-                />
-              )}
+              initial={{ opacity: 0, scale: 0.82 }}
+              animate={ready && !prefersReduced ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
+              transition={{ duration: 1.6, delay: 0.90, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] aspect-square bg-[radial-gradient(circle,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.01)_55%,transparent_72%)] rounded-full blur-[65px] pointer-events-none z-[1]"
+            />
 
-              <img
+            {/* Stage 1 & 2 / Layer 2: Mask / Clip-Path Curtain Container */}
+            <motion.div
+              initial={!prefersReduced ? { clipPath: "inset(100% 0% 0% 0%)" } : { clipPath: "inset(0% 0% 0% 0%)" }}
+              animate={ready && !prefersReduced ? { clipPath: "inset(0% 0% 0% 0%)" } : { clipPath: "inset(0% 0% 0% 0%)" }}
+              transition={{ duration: 1.85, delay: 0.35, ease: [0.16, 1, 0.3, 1] as Bezier }}
+              style={{
+                width: "100%",
+                position: "relative",
+                zIndex: 2,
+                willChange: "clip-path",
+              }}
+            >
+
+              {/* Actual Profile Image — starts at translateY(70px) + scale(1.09) and smoothly settles to (0, 1.0) */}
+              <motion.img
                 ref={portraitImgRef}
-                src="/potrait.png"
+                src={PROFILE_IMAGE || "/potrait.png"}
                 alt={`${NAME} — ${ROLE}`}
                 crossOrigin="anonymous"
+                initial={!prefersReduced ? { y: 70, scale: 1.09, opacity: 0.2 } : { y: 0, scale: 1, opacity: 1 }}
+                animate={ready && !prefersReduced ? { y: 0, scale: 1.0, opacity: 1 } : { y: 0, scale: 1, opacity: 1 }}
+                transition={{ duration: 2.0, delay: 0.35, ease: [0.16, 1, 0.3, 1] as Bezier }}
                 onLoad={e => {
                   const img = e.currentTarget as HTMLImageElement;
                   if (silhouetteDataRef.current.stars.length === 0) {
@@ -672,6 +680,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                   userSelect: "none",
                   position: "relative",
                   zIndex: 2,
+                  willChange: "transform, opacity",
                   /* Fade out at bottom only */
                   WebkitMaskImage: `linear-gradient(
                     to bottom,
@@ -691,7 +700,26 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                 draggable={false}
               />
             </motion.div>
+
+            {/* Stage 4 / Layer 3: Interactive Canvas Star Matrix & Rim Beam Layer (fades in after image reveal settles) */}
+            {!prefersReduced && (
+              <motion.canvas
+                ref={canvasRef}
+                aria-hidden="true"
+                initial={{ opacity: 0 }}
+                animate={ready && !prefersReduced ? { opacity: 1 } : { opacity: 1 }}
+                transition={{ duration: 1.1, delay: 1.30, ease: "easeOut" }}
+                style={{
+                  position: "absolute",
+                  top: "-80px",
+                  left: "-80px",
+                  pointerEvents: "none",
+                  zIndex: 3,
+                }}
+              />
+            )}
           </motion.div>
+
 
           {/* ── TEXT — left-aligned, upper portion, above portrait ── */}
           <motion.div
@@ -712,33 +740,65 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               paddingLeft: "clamp(24px, 8vw, 160px)",
             }}
           >
-            {/* "Hi, I'm Kishor" */}
-            <motion.div
-              {...(ready && !prefersReduced ? fadeUp(T.greeting) : {})}
+            {/* "Hi, I'm Kishor" — Masked Word-by-Word Sequential Reveal */}
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "clamp(36px, 6vw, 82px)",
+                letterSpacing: "-0.03em",
+                color: "rgba(255,255,255,0.95)",
+                lineHeight: 1.08,
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "baseline",
+                columnGap: "0.28em",
+              }}
             >
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(36px, 6vw, 82px)",
-                  fontWeight: 300,
-                  letterSpacing: "-0.03em",
-                  color: "rgba(255,255,255,0.95)",
-                  lineHeight: 1.08,
-                }}
-              >
-                <span style={{ fontWeight: 300 }}>Hi, I&apos;m </span>
-                <span style={{ fontWeight: 700 }}>{firstName}</span>
-              </h1>
-            </motion.div>
+              <span className="overflow-hidden inline-block">
+                <motion.span
+                  initial={{ y: "115%", opacity: 0 }}
+                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1.0, 0.3, 1] }}
+                  className="inline-block font-light"
+                >
+                  Hi,
+                </motion.span>
+              </span>
 
-            {/* Rotating tagline */}
+              <span className="overflow-hidden inline-block">
+                <motion.span
+                  initial={{ y: "115%", opacity: 0 }}
+                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.24, ease: [0.16, 1.0, 0.3, 1] }}
+                  className="inline-block font-light"
+                >
+                  I&apos;m
+                </motion.span>
+              </span>
+
+              <span className="overflow-hidden inline-block">
+                <motion.span
+                  initial={{ y: "115%", opacity: 0 }}
+                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  transition={{ duration: 0.85, delay: 0.38, ease: [0.16, 1.0, 0.3, 1] }}
+                  className="inline-block font-bold text-white"
+                >
+                  {firstName}
+                </motion.span>
+              </span>
+            </h1>
+
+            {/* Rotating tagline — Masked Reveal */}
             <motion.div
-              {...(ready && !prefersReduced ? fadeUp(T.role) : {})}
+              initial={{ opacity: 0, y: 14 }}
+              animate={ready && !prefersReduced ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: T.role, ease: [0.16, 1.0, 0.3, 1] }}
               style={{ marginTop: "clamp(4px, 0.6vh, 8px)" }}
             >
               <RotatingTagline />
             </motion.div>
           </motion.div>
+
 
           {/* ── BOTTOM CTA AREA ── */}
           <div
@@ -756,7 +816,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
           >
             {/* Tech strip — 'Experienced in' with circular tech logo badges matching reference */}
             <motion.div
-              {...(ready && !prefersReduced ? fadeIn(T.cta, 0.7) : {})}
+              {...(ready && !prefersReduced ? fadeUp(0.72, 14) : {})}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -853,8 +913,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             </motion.div>
 
             {/* CTA Buttons */}
-            <motion.div
-              {...(ready && !prefersReduced ? fadeIn(T.cta + 0.1, 0.7) : {})}
+            <div
               style={{
                 display: "flex",
                 gap: "clamp(10px, 2vw, 14px)",
@@ -862,82 +921,95 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                 justifyContent: "center",
               }}
             >
-              {/* Primary */}
+              {/* Primary — with live animated specular rim light beam */}
               <motion.a
                 href="#projects"
+                {...(ready && !prefersReduced ? fadeUp(0.88, 16) : {})}
                 onClick={e => {
                   e.preventDefault();
                   document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: easeOut }}
                 style={{
-                  display: "flex",
+                  position: "relative",
+                  overflow: "hidden",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 8,
-                  padding: "clamp(11px,1.6vh,15px) clamp(22px,3vw,36px)",
+                  justifyContent: "center",
+                  padding: "clamp(12px,1.6vh,15px) clamp(26px,3vw,38px)",
                   borderRadius: 12,
                   fontSize: "clamp(13px, 1.1vw, 14.5px)",
                   fontWeight: 500,
-                  color: "rgba(255,255,255,0.92)",
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.14)",
+                  color: "#ffffff",
                   cursor: "pointer",
                   textDecoration: "none",
                   letterSpacing: "0.01em",
-                  transition: "background 0.25s, border-color 0.25s",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.13)";
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.26)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.08)";
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.14)";
+                  background: "#0c0c0c",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
                 }}
               >
-                View Impact &amp; Work
+                {/* 1. Base Static Subtle Border */}
+                <div
+                  className="absolute inset-0 rounded-[12px] pointer-events-none"
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    zIndex: 1,
+                  }}
+                />
+
+                {/* 2. Specular Rim Light with Continuous Parametric Arc Interpolation */}
+                <SpecularRimBeam radius={12} duration={5.5} beamLength={82} style={{ zIndex: 2 }} />
+
+                {/* 3. Button Text */}
+                <span className="relative z-10 font-medium text-white tracking-wide flex items-center gap-2">
+                  View Impact &amp; Work
+                </span>
               </motion.a>
 
-              {/* Secondary */}
+              {/* Secondary — Contact */}
               <motion.a
                 href="#contact"
+                {...(ready && !prefersReduced ? fadeUp(1.0, 16) : {})}
                 onClick={e => {
                   e.preventDefault();
                   document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: easeOut }}
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
-                  padding: "clamp(11px,1.6vh,15px) clamp(22px,3vw,36px)",
+                  padding: "clamp(12px,1.6vh,15px) clamp(26px,3vw,38px)",
                   borderRadius: 12,
                   fontSize: "clamp(13px, 1.1vw, 14.5px)",
                   fontWeight: 500,
                   color: "rgba(255,255,255,0.92)",
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   cursor: "pointer",
                   textDecoration: "none",
                   letterSpacing: "0.01em",
                   transition: "background 0.25s, border-color 0.25s",
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.13)";
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.26)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.12)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.25)";
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.08)";
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.14)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.12)";
                 }}
               >
-                Book a 30 min call
+                Contact
               </motion.a>
-            </motion.div>
+            </div>
+
+
+
           </div>
 
         </section>

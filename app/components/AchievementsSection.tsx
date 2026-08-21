@@ -163,28 +163,42 @@ export default function AchievementsSection() {
         }
       `}</style>
 
-      {/* Header */}
+      {/* Header with Masked Title Reveal */}
       <div className="w-[96%] max-w-6xl mx-auto px-4 sm:px-6 mb-14 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.6 }}
-          className="space-y-3"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase">
+        <div className="space-y-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1.0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase"
+          >
             <Sparkles size={12} className="text-amber-400" />
-            <span>Honors & Certifications</span>
+            <span>Honors &amp; Certifications</span>
+          </motion.div>
+
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: "115%", opacity: 0 }}
+              whileInView={{ y: "0%", opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.75, delay: 0.08, ease: [0.16, 1.0, 0.3, 1] }}
+              className="text-4xl sm:text-5xl font-black text-white tracking-tight"
+            >
+              Achievements &amp; Certifications
+            </motion.h2>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
-            Achievements & Certifications
-          </h2>
-
-          <p className="max-w-xl mx-auto text-sm sm:text-base text-white/55 font-light leading-relaxed">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-xl mx-auto text-sm sm:text-base text-white/55 font-light leading-relaxed"
+          >
             Hackathon podiums, industry certifications, and validated engineering credentials earned under real evaluation.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
       </div>
 
       {/* Infinite Horizontal Rolling Loop Track (Right → Left) */}

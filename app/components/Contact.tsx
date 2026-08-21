@@ -2,149 +2,143 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Github, Linkedin, MapPin, Clock, ArrowUpRight, Copy, Check, Sparkles, Send } from 'lucide-react';
-import { EMAIL, SOCIAL, LOCATION, RESPONSE_TIME, AVAILABILITY_STATUS, RESUME_URL } from '../lib/data';
+import { Mail, Github, Linkedin, ArrowUpRight, Copy, Check, MapPin, FileText } from 'lucide-react';
+import { EMAIL, SOCIAL, LOCATION, RESUME_URL } from '../lib/data';
 import portfolioConfig from '../../portfolio.config';
+import { ease } from '../lib/motion';
 
+/* ─────────────────────────────────────────────────────────────
+   ULTRA-MINIMALIST MONOCHROME CONTACT SECTION
+   - Matching reference image style:
+     • Prominent Serif Italic Heading
+     • Clean, spacious, pitch-black background
+     • Very minimal greyish links & metadata (no heavy cards or colors)
+───────────────────────────────────────────────────────────── */
 export default function Contact() {
   const [copied, setCopied] = useState(false);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(EMAIL);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2200);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <section
       id="contact"
-      className="relative w-full py-28 sm:py-36 px-4 sm:px-6 md:px-8 text-white overflow-hidden bg-black"
+      className="relative w-full py-32 sm:py-44 px-4 sm:px-6 md:px-8 text-white bg-black select-none overflow-hidden"
     >
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-r from-emerald-500/5 via-cyan-500/5 to-purple-500/5 blur-[120px] pointer-events-none" />
-
-      <div className="w-[96%] max-w-5xl mx-auto space-y-14 relative z-10">
+      <div className="w-[96%] max-w-4xl mx-auto text-center space-y-12 sm:space-y-16">
         
-        {/* ── Section Header ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-4"
-        >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-semibold tracking-[0.2em] uppercase">
-            <Sparkles size={12} className="text-emerald-400" />
-            <span>Get In Touch</span>
+        {/* ── Heading matching Reference Style ("Contributed with Impact") ── */}
+        <div className="space-y-4">
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: "115%", opacity: 0 }}
+              whileInView={{ y: "0%", opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.85, ease: ease.cinematic }}
+              className="font-serif italic text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-white/95 font-normal tracking-tight leading-tight"
+            >
+              Let&apos;s build something exceptional.
+            </motion.h2>
           </div>
 
-          <h2 className="font-serif italic text-4xl sm:text-5xl md:text-6xl text-white font-normal tracking-tight">
-            Let&apos;s build something exceptional.
-          </h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
+            className="text-white/45 text-sm sm:text-base md:text-lg max-w-lg mx-auto font-light leading-relaxed tracking-wide"
+          >
+            {portfolioConfig.contact?.subheading || "Open to full-time engineering roles, internships, and high-impact systems."}
+          </motion.p>
+        </div>
 
-          <p className="text-white/55 text-base sm:text-lg max-w-xl mx-auto font-light leading-relaxed">
-            {portfolioConfig.contact.subheading}
-          </p>
-        </motion.div>
-
-        {/* ── Main Contact Card ── */}
+        {/* ── Primary Email Link (Muted Greyish Typography) ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="rounded-[28px] sm:rounded-[36px] bg-[#0c0c0c] border border-white/12 p-8 sm:p-12 md:p-14 shadow-[0_32px_80px_rgba(0,0,0,0.95)]"
+          transition={{ duration: 0.65, delay: 0.25, ease: ease.out }}
+          className="space-y-3"
         >
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-8 sm:pb-10 border-b border-white/10">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{AVAILABILITY_STATUS}</span>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {EMAIL}
-              </h3>
-              <p className="text-sm text-white/50 mt-1">
-                Typical response time: <span className="text-white/80">{RESPONSE_TIME}</span>
-              </p>
-            </div>
+          <div className="inline-flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={`mailto:${EMAIL}`}
+              className="font-serif italic text-2xl sm:text-3xl md:text-4xl text-white/75 hover:text-white transition-colors duration-300 tracking-tight"
+            >
+              {EMAIL}
+            </a>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3">
-              <a
-                href={`mailto:${EMAIL}`}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
-              >
-                <Send size={15} />
-                <span>Send Email</span>
-              </a>
-
-              <button
-                onClick={handleCopyEmail}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 text-white font-medium text-sm transition-all"
-              >
-                {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
-                <span>{copied ? 'Copied to Clipboard' : 'Copy Email'}</span>
-              </button>
-            </div>
+            <button
+              onClick={handleCopyEmail}
+              aria-label="Copy email address"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono text-white/40 hover:text-white/80 border border-white/10 hover:border-white/20 transition-all duration-200"
+            >
+              {copied ? (
+                <>
+                  <Check size={12} className="text-white/90" />
+                  <span className="text-white/90">Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={12} />
+                  <span>Copy</span>
+                </>
+              )}
+            </button>
           </div>
+        </motion.div>
 
-          {/* Bottom Info Grid & Socials */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 sm:pt-10">
+        {/* ── Greyish Minimalist Navigation / Links Grid (Matching Reference Logo Grid) ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.35, ease: ease.out }}
+          className="pt-6 sm:pt-10 border-t border-white/[0.08] max-w-2xl mx-auto"
+        >
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16 text-xs sm:text-[13px] tracking-wider uppercase font-medium text-white/45">
             
+            {/* GitHub */}
+            <a
+              href={SOCIAL.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-white transition-colors duration-300"
+            >
+              <Github size={15} className="opacity-70" />
+              <span>GitHub</span>
+            </a>
+
+            {/* LinkedIn */}
+            <a
+              href={SOCIAL.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-white transition-colors duration-300"
+            >
+              <Linkedin size={15} className="opacity-70" />
+              <span>LinkedIn</span>
+            </a>
+
+            {/* Resume */}
+            <a
+              href={RESUME_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-white transition-colors duration-300"
+            >
+              <FileText size={15} className="opacity-70" />
+              <span>Resume</span>
+              <ArrowUpRight size={13} className="opacity-60" />
+            </a>
+
             {/* Location */}
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 shrink-0">
-                <MapPin size={18} />
-              </div>
-              <div>
-                <p className="text-xs text-white/40 font-semibold uppercase tracking-wider">Location</p>
-                <p className="text-sm font-medium text-white/90 mt-0.5">{LOCATION}</p>
-              </div>
-            </div>
-
-            {/* Availability */}
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 shrink-0">
-                <Clock size={18} />
-              </div>
-              <div>
-                <p className="text-xs text-white/40 font-semibold uppercase tracking-wider">Timezone & Hours</p>
-                <p className="text-sm font-medium text-white/90 mt-0.5">IST (UTC+5:30) • Flexible</p>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="flex items-center gap-2.5 sm:justify-end">
-              <a
-                href={SOCIAL.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10 transition-all"
-                title="GitHub"
-              >
-                <Github size={18} />
-              </a>
-
-              <a
-                href={SOCIAL.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 hover:bg-white/10 transition-all"
-                title="LinkedIn"
-              >
-                <Linkedin size={18} />
-              </a>
-
-              <a
-                href={RESUME_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/40 text-xs font-semibold text-white/80 hover:text-white transition-all ml-1"
-              >
-                <span>Resume</span>
-                <ArrowUpRight size={13} />
-              </a>
+            <div className="inline-flex items-center gap-1.5 text-white/35">
+              <MapPin size={14} className="opacity-60" />
+              <span>{LOCATION || "Tamil Nadu, India"}</span>
             </div>
 
           </div>

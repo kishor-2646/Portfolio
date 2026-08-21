@@ -16,18 +16,18 @@ export default function AboutSection() {
   // Trigger animation once when 25% of the section enters the viewport
   const isInView = useInView(containerRef, { once: true, amount: 0.25 });
 
-  // Blur-to-focus text animation with subtle 8px translation
+  // Editorial masked reveal with subtle translation and cinematic deceleration
   const textAnim = (delay: number) => ({
     initial: prefersReduced
-      ? { opacity: 1, filter: "blur(0px)", y: 0 }
-      : { opacity: 0, filter: "blur(6px)", y: 8 },
+      ? { opacity: 1, y: 0 }
+      : { opacity: 0, y: 16 },
     animate: (isInView || prefersReduced)
-      ? { opacity: 1, filter: "blur(0px)", y: 0 }
-      : { opacity: 0, filter: "blur(6px)", y: 8 },
+      ? { opacity: 1, y: 0 }
+      : { opacity: 0, y: 16 },
     transition: {
-      duration: 0.9,
+      duration: 0.8,
       delay: prefersReduced ? 0 : delay,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      ease: [0.16, 1.0, 0.3, 1] as [number, number, number, number],
     },
   });
 
@@ -59,7 +59,7 @@ export default function AboutSection() {
           {/* Text Block 3 — Engineering Philosophy (delay 0.75s) */}
           <motion.div {...textAnim(0.75)}>
             <p className="text-lg sm:text-xl md:text-2xl lg:text-[1.38rem] font-light text-white/90 leading-[1.5] tracking-tight">
-              Crafting software where complex architecture translates into effortless user experiences.
+              {ABOUT_TAGLINE}
             </p>
           </motion.div>
 
@@ -69,6 +69,7 @@ export default function AboutSection() {
               That’s exactly what I build.
             </p>
           </motion.div>
+
 
           {/* 8-Stroke Sequential Signature Component */}
           <motion.div {...textAnim(1.45)} className="pt-2">
