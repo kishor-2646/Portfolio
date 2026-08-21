@@ -130,12 +130,15 @@ const ACHIEVEMENTS_LIST: AchievementCard[] = [
   },
 ];
 
+import { useScrollDirection } from '../lib/useScrollDirection';
+
 /* ─────────────────────────────────────────────────────────────
    ACHIEVEMENTS & CERTIFICATIONS SECTION
    - Seamless continuous loop / marquee scrolling from Right → Left
    - High visual fidelity matching reference image 1
 ───────────────────────────────────────────────────────────── */
 export default function AchievementsSection() {
+  const scrollDirection = useScrollDirection();
   // Duplicate array for seamless infinite marquee loop
   const loopCards = [...ACHIEVEMENTS_LIST, ...ACHIEVEMENTS_LIST, ...ACHIEVEMENTS_LIST];
 
@@ -167,9 +170,9 @@ export default function AchievementsSection() {
       <div className="w-[96%] max-w-6xl mx-auto px-4 sm:px-6 mb-14 text-center">
         <div className="space-y-3">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1.0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, scale: 0.95, y: scrollDirection === 'down' ? 10 : -10 }}
+            whileInView={{ opacity: 1, scale: 1.0, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase"
           >
@@ -179,9 +182,9 @@ export default function AchievementsSection() {
 
           <div className="overflow-hidden">
             <motion.h2
-              initial={{ y: "115%", opacity: 0 }}
+              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
               whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.75, delay: 0.08, ease: [0.16, 1.0, 0.3, 1] }}
               className="text-4xl sm:text-5xl font-black text-white tracking-tight"
             >
@@ -190,9 +193,9 @@ export default function AchievementsSection() {
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 12 : -12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-xl mx-auto text-sm sm:text-base text-white/55 font-light leading-relaxed"
           >
@@ -202,7 +205,13 @@ export default function AchievementsSection() {
       </div>
 
       {/* Infinite Horizontal Rolling Loop Track (Right → Left) */}
-      <div className="relative w-full overflow-hidden py-4">
+      <motion.div
+        initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.15 }}
+        transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full overflow-hidden py-4"
+      >
         
         {/* Left & Right Gradient Fade Vignettes */}
         <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 bg-gradient-to-r from-black via-black/80 to-transparent z-20 pointer-events-none" />
@@ -287,7 +296,7 @@ export default function AchievementsSection() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

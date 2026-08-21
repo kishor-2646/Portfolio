@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Copy, Check, ExternalLink, Github, Sparkles, Terminal, Code2, Layers, Cpu, Play, ArrowUpRight } from 'lucide-react';
 import { RESUME_URL, EMAIL, NAME, ROLE, PROFILE_IMAGE, BLOGS_UI } from '../lib/data';
-import { ease, dur, cardEntrance } from '../lib/motion';
+import { ease, dur, directionalCardEntrance } from '../lib/motion';
+import { useScrollDirection } from '../lib/useScrollDirection';
 
 /* ─────────────────────────────────────────────────────────────
    BLOGS & STUDY NOTES SECTION (MATCHING REFERENCE IMAGE 2)
@@ -17,6 +18,7 @@ import { ease, dur, cardEntrance } from '../lib/motion';
 ───────────────────────────────────────────────────────────── */
 export default function BlogsSection() {
   const [copied, setCopied] = useState(false);
+  const scrollDirection = useScrollDirection();
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(EMAIL || 'Kishorekumar20002646@gmail.com');
@@ -35,9 +37,9 @@ export default function BlogsSection() {
         <div className="text-center mb-14 sm:mb-18">
           <div className="overflow-hidden">
             <motion.h2
-              initial={{ y: "115%", opacity: 0 }}
+              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
               whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.75, ease: ease.cinematic }}
               className="font-serif italic text-4xl sm:text-5xl md:text-6xl text-white font-normal tracking-tight"
             >
@@ -46,9 +48,9 @@ export default function BlogsSection() {
           </div>
           
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 12 : -12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
             className="text-sm sm:text-base text-white/50 mt-2.5 font-light max-w-lg mx-auto leading-relaxed"
           >
@@ -64,7 +66,7 @@ export default function BlogsSection() {
             
             {/* Card 1: Large Featured Article */}
             <motion.div
-              {...cardEntrance(0.1, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.1, 24)}
               whileHover={{ y: -4 }}
               className="
                 group rounded-[20px] overflow-hidden p-6 bg-[#0b0b0b] border border-white/10
@@ -99,7 +101,7 @@ export default function BlogsSection() {
 
             {/* Card 2: Horizontal Compact Note (DSA) */}
             <motion.div
-              {...cardEntrance(0.18, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.18, 24)}
               whileHover={{ y: -3 }}
               className="
                 group rounded-[20px] p-5 bg-[#0b0b0b] border border-white/10
@@ -122,7 +124,7 @@ export default function BlogsSection() {
 
             {/* Card 3: Horizontal Compact Note (State Management) */}
             <motion.div
-              {...cardEntrance(0.24, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.24, 24)}
               whileHover={{ y: -3 }}
               className="
                 group rounded-[20px] p-5 bg-[#0b0b0b] border border-white/10
@@ -150,7 +152,7 @@ export default function BlogsSection() {
             
             {/* Card 4: Center Portrait Feature Showcase */}
             <motion.div
-              {...cardEntrance(0.14, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.14, 24)}
               whileHover={{ y: -4 }}
               className="
                 group rounded-[20px] overflow-hidden p-6 bg-[#0b0b0b] border border-white/10
@@ -202,7 +204,7 @@ export default function BlogsSection() {
 
             {/* Card 5: Quick Action Bar */}
             <motion.div
-              {...cardEntrance(0.26, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.26, 24)}
               className="
                 rounded-[20px] p-4 bg-[#0b0b0b] border border-white/10
                 shadow-[0_16px_40px_rgba(0,0,0,0.85)]
@@ -243,7 +245,7 @@ export default function BlogsSection() {
             
             {/* Card 6: Failure Logs & War Stories Card */}
             <motion.div
-              {...cardEntrance(0.16, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.16, 24)}
               whileHover={{ y: -4 }}
               className="
                 group rounded-[20px] overflow-hidden p-6 bg-[#0b0b0b] border border-white/10
@@ -279,7 +281,7 @@ export default function BlogsSection() {
 
             {/* Card 7: Engineering Takeaways Feed */}
             <motion.div
-              {...cardEntrance(0.28, 24)}
+              {...directionalCardEntrance(scrollDirection, 0.28, 24)}
               whileHover={{ y: -3 }}
               className="
                 group rounded-[20px] p-5 bg-[#0b0b0b] border border-white/10
@@ -317,7 +319,7 @@ export default function BlogsSection() {
           
           {/* Bottom Card 1 */}
           <motion.div
-            {...cardEntrance(0.32, 24)}
+            {...directionalCardEntrance(scrollDirection, 0.32, 24)}
             whileHover={{ y: -3 }}
             className="
               group rounded-[20px] p-6 bg-[#0b0b0b] border border-white/10
@@ -341,7 +343,7 @@ export default function BlogsSection() {
 
           {/* Bottom Card 2 */}
           <motion.div
-            {...cardEntrance(0.36, 24)}
+            {...directionalCardEntrance(scrollDirection, 0.36, 24)}
             whileHover={{ y: -3 }}
             className="
               group rounded-[20px] p-6 bg-[#0b0b0b] border border-white/10

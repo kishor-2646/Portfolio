@@ -171,6 +171,8 @@ const EXPERIENCES: ExperienceItem[] = [
   },
 ];
 
+import { useScrollDirection } from '../lib/useScrollDirection';
+
 /* ─────────────────────────────────────────────────────────────
    PINNED HORIZONTAL TIMELINE EXPERIENCE SECTION
    - Sharp corners (rounded-[2px] instead of smooth rounded-2xl)
@@ -179,6 +181,7 @@ const EXPERIENCES: ExperienceItem[] = [
 ───────────────────────────────────────────────────────────── */
 export default function JourneySection() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const scrollDirection = useScrollDirection();
 
   // Measure vertical scroll progress across the container
   const { scrollYProgress } = useScroll({
@@ -207,9 +210,9 @@ export default function JourneySection() {
           {/* Section Header with Masked Title Reveal */}
           <div className="max-w-4xl mx-auto text-center z-20">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1.0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, scale: 0.95, y: scrollDirection === 'down' ? 10 : -10 }}
+              whileInView={{ opacity: 1, scale: 1.0, y: 0 }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-semibold tracking-[0.2em] uppercase mb-3"
             >
@@ -219,9 +222,9 @@ export default function JourneySection() {
 
             <div className="overflow-hidden">
               <motion.h2
-                initial={{ y: "115%", opacity: 0 }}
+                initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
                 whileInView={{ y: "0%", opacity: 1 }}
-                viewport={{ once: true }}
+                viewport={{ once: false, amount: 0.2 }}
                 transition={{ duration: 0.75, delay: 0.08, ease: [0.16, 1.0, 0.3, 1] }}
                 className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight"
               >
@@ -230,9 +233,9 @@ export default function JourneySection() {
             </div>
 
             <motion.p
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: scrollDirection === 'down' ? 12 : -12 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="text-sm lg:text-base text-white/50 font-light mt-2 max-w-xl mx-auto leading-relaxed"
             >
@@ -491,11 +494,18 @@ export default function JourneySection() {
 
         {/* Vertical Timeline Stack */}
         <div className="relative border-l-2 border-white/15 ml-4 space-y-10 pl-6">
-          {EXPERIENCES.map(exp => {
+          {EXPERIENCES.map((exp, expIdx) => {
             const IconComponent = exp.icon;
 
             return (
-              <div key={exp.id} className="relative">
+              <motion.div
+                key={exp.id}
+                initial={{ opacity: 0, y: scrollDirection === 'down' ? 20 : -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.15 }}
+                transition={{ duration: 0.5, delay: expIdx * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                className="relative"
+              >
                 {/* Node */}
                 <div
                   className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-black ${exp.accent.dotBg} ${exp.accent.dotShadow}`}
@@ -540,7 +550,7 @@ export default function JourneySection() {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

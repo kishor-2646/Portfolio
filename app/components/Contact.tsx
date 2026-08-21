@@ -6,6 +6,7 @@ import { Mail, Github, Linkedin, ArrowUpRight, Copy, Check, MapPin, FileText } f
 import { EMAIL, SOCIAL, LOCATION, RESUME_URL } from '../lib/data';
 import portfolioConfig from '../../portfolio.config';
 import { ease } from '../lib/motion';
+import { useScrollDirection } from '../lib/useScrollDirection';
 
 /* ─────────────────────────────────────────────────────────────
    ULTRA-MINIMALIST MONOCHROME CONTACT SECTION
@@ -16,6 +17,7 @@ import { ease } from '../lib/motion';
 ───────────────────────────────────────────────────────────── */
 export default function Contact() {
   const [copied, setCopied] = useState(false);
+  const scrollDirection = useScrollDirection();
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(EMAIL);
@@ -34,9 +36,9 @@ export default function Contact() {
         <div className="space-y-4">
           <div className="overflow-hidden">
             <motion.h2
-              initial={{ y: "115%", opacity: 0 }}
+              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
               whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.85, ease: ease.cinematic }}
               className="font-serif italic text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-white/95 font-normal tracking-tight leading-tight"
             >
@@ -45,9 +47,9 @@ export default function Contact() {
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 10 : -10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
             className="text-white/45 text-sm sm:text-base md:text-lg max-w-lg mx-auto font-light leading-relaxed tracking-wide"
           >
@@ -57,9 +59,9 @@ export default function Contact() {
 
         {/* ── Primary Email Link (Muted Greyish Typography) ── */}
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: scrollDirection === 'down' ? 14 : -14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.65, delay: 0.25, ease: ease.out }}
           className="space-y-3"
         >
@@ -93,9 +95,9 @@ export default function Contact() {
 
         {/* ── Greyish Minimalist Navigation / Links Grid (Matching Reference Logo Grid) ── */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: scrollDirection === 'down' ? 16 : -16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.7, delay: 0.35, ease: ease.out }}
           className="pt-6 sm:pt-10 border-t border-white/[0.08] max-w-2xl mx-auto"
         >

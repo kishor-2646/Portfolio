@@ -226,7 +226,16 @@ function StackCard({
           {/* ── RIGHT COLUMN: Clean Media Preview (~25% Larger) ── */}
           <div className="lg:col-span-7 xl:col-span-7 w-full flex items-center justify-center">
             <div className="relative w-full aspect-[1.32] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-black/60 min-h-[300px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[480px] xl:min-h-[520px]">
-              {hasImage ? (
+              {project.video || project.slug === 'greenwave' ? (
+                <video
+                  src={project.video || "/perfect_but_also_show_that_o.mp4"}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                />
+              ) : hasImage ? (
                 <img
                   src={project.image}
                   alt={project.title}
@@ -251,12 +260,15 @@ function StackCard({
   );
 }
 
+import { useScrollDirection } from '../lib/useScrollDirection';
+
 /* ─────────────────────────────────────────────────────────────
    MAIN PROJECTS SECTION
 ───────────────────────────────────────────────────────────── */
 export default function ProjectsSection() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const scrollDirection = useScrollDirection();
 
   // Measure scroll progress through the entire project stacking section
   const { scrollYProgress } = useScroll({
@@ -281,9 +293,9 @@ export default function ProjectsSection() {
       <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 mb-12 sm:mb-16">
         <div className="space-y-3">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1.0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, scale: 0.95, y: scrollDirection === 'down' ? 10 : -10 }}
+            whileInView={{ opacity: 1, scale: 1.0, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.55, ease: ease.out }}
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase"
           >
@@ -293,9 +305,9 @@ export default function ProjectsSection() {
 
           <div className="overflow-hidden">
             <motion.h2
-              initial={{ y: "115%", opacity: 0 }}
+              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
               whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.75, delay: 0.08, ease: ease.cinematic }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight"
             >
@@ -304,9 +316,9 @@ export default function ProjectsSection() {
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 16 : -16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.65, delay: 0.2, ease: ease.out }}
             className="max-w-2xl text-base sm:text-lg text-white/60 leading-relaxed font-light"
           >
@@ -351,9 +363,9 @@ export default function ProjectsSection() {
         <div className="text-center mb-12 sm:mb-16">
           <div className="overflow-hidden">
             <motion.h3
-              initial={{ y: "115%", opacity: 0 }}
+              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
               whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.75, ease: ease.cinematic }}
               className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-white font-normal tracking-tight"
             >
@@ -362,9 +374,9 @@ export default function ProjectsSection() {
           </div>
           
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 12 : -12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
             className="text-sm sm:text-base text-white/50 mt-2.5 font-light"
           >
@@ -377,9 +389,9 @@ export default function ProjectsSection() {
           
           {/* Card 1: Cargo Flow */}
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.15 }}
             transition={{ duration: 0.65, delay: 0.1, ease: ease.out }}
             whileHover={{ y: -4 }}
             className="group cursor-pointer flex flex-col justify-between"
@@ -409,9 +421,9 @@ export default function ProjectsSection() {
 
           {/* Card 2: PCify Learning */}
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
-            viewport={{ once: true }}
+            viewport={{ once: false, amount: 0.15 }}
             transition={{ duration: 0.65, delay: 0.22, ease: ease.out }}
             whileHover={{ y: -4 }}
             className="group cursor-pointer flex flex-col justify-between"

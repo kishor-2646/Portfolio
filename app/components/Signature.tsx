@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 // Hand-authored centerline strokes tracing the reference handwriting
 // (upright cursive, looped K arm/leg, looped i-dot, hooked r with
@@ -54,6 +54,7 @@ export default function Signature({
     const svgEl = svgRef.current;
     if (!svgEl) return;
 
+    // Reset or prepare stroke paths
     const schedule: { path: SVGPathElement; start: number; duration: number; len: number }[] = [];
     let cursor = 0;
 
@@ -74,60 +75,51 @@ export default function Signature({
 
     const total = cursor;
 
-    function play() {
-      let startTime: number | null = null;
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
 
-      function frame(ts: number) {
-        if (startTime === null) startTime = ts;
-        const elapsed = ts - startTime;
+    if (!trigger) {
+      // If trigger is false, reset all paths to unwritten state
+      schedule.forEach(item => {
+        item.path.style.strokeDashoffset = String(item.len);
+      });
+      return;
+    }
 
-        schedule.forEach((item) => {
-          const localT = elapsed - item.start;
-          if (localT <= 0) {
-            item.path.style.strokeDashoffset = String(item.len);
-          } else if (localT >= item.duration) {
-            item.path.style.strokeDashoffset = "0";
-          } else {
-            const frac = localT / item.duration;
-            const eased = 1 - Math.pow(1 - frac, 2); // ease-out
-            item.path.style.strokeDashoffset = String(item.len * (1 - eased));
-          }
-        });
+    // Play signature drawing animation when triggered
+    let startTime: number | null = null;
 
-        if (elapsed < total) {
-          rafRef.current = requestAnimationFrame(frame);
+    function frame(ts: number) {
+      if (startTime === null) startTime = ts;
+      const elapsed = ts - startTime;
+
+      schedule.forEach((item) => {
+        const localT = elapsed - item.start;
+        if (localT <= 0) {
+          item.path.style.strokeDashoffset = String(item.len);
+        } else if (localT >= item.duration) {
+          item.path.style.strokeDashoffset = "0";
+        } else {
+          const frac = localT / item.duration;
+          const eased = 1 - Math.pow(1 - frac, 2); // ease-out
+          item.path.style.strokeDashoffset = String(item.len * (1 - eased));
         }
+      });
+
+      if (elapsed < total) {
+        rafRef.current = requestAnimationFrame(frame);
       }
-
-      rafRef.current = requestAnimationFrame(frame);
     }
 
-    let triggered = false;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if ((entry.isIntersecting || trigger) && !triggered) {
-            triggered = true;
-            play();
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(svgEl);
-
-    // Also trigger if prop becomes true
-    if (trigger && !triggered) {
-      triggered = true;
-      play();
-      observer.disconnect();
-    }
+    rafRef.current = requestAnimationFrame(frame);
 
     return () => {
-      observer.disconnect();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
   }, [trigger]);
 
@@ -160,4 +152,3 @@ export default function Signature({
     </div>
   );
 }
-

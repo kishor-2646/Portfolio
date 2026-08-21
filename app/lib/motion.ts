@@ -3,7 +3,10 @@
  *
  * Cinematic, premium, modern, and minimal motion tokens and reusable variants.
  * Follows the 60fps GPU performance budget: transforms, opacity, and mask reveals.
+ * Supports bi-directional, recurring scroll entrance transitions across all sections.
  */
+
+import type { ScrollDirection } from './useScrollDirection';
 
 // ─────────────────────────────────────────────────────────
 //  EASING CURVES (CUBIC-BEZIER)
@@ -43,11 +46,23 @@ export const maskedTextReveal = (delay = 0, duration = dur.reveal) => ({
   transition: { duration, delay, ease: ease.cinematic },
 });
 
-/** Scroll-triggered Masked Slide-Up Reveal */
+/** Scroll-triggered Masked Slide Reveal (Repeats on every scroll entry) */
 export const scrollMaskReveal = (delay = 0, duration = dur.reveal) => ({
   initial:    { y: "115%", opacity: 0 },
   whileInView:{ y: "0%",   opacity: 1 },
-  viewport:   { once: true, margin: "-40px" },
+  viewport:   { once: false, amount: 0.2 },
+  transition: { duration, delay, ease: ease.cinematic },
+});
+
+/** Directional Mask Reveal (Direction-aware slide: up when scrolling down, down when scrolling up) */
+export const directionalMaskReveal = (
+  direction: ScrollDirection = 'down',
+  delay = 0,
+  duration = dur.reveal
+) => ({
+  initial:    { y: direction === 'down' ? "100%" : "-100%", opacity: 0 },
+  whileInView:{ y: "0%", opacity: 1 },
+  viewport:   { once: false, amount: 0.2 },
   transition: { duration, delay, ease: ease.cinematic },
 });
 
@@ -60,15 +75,47 @@ export const staggerContainer = (staggerChildren = 0.08, delayChildren = 0) => (
   whileInView: {
     transition: { staggerChildren, delayChildren },
   },
-  viewport: { once: true, margin: "-50px" },
+  viewport: { once: false, amount: 0.15 },
 });
 
 /** Progressive Card Entrance (opacity + subtle translateY + subtle scale) */
 export const cardEntrance = (delay = 0, distance = 24) => ({
   initial:    { opacity: 0, y: distance, scale: 0.98 },
   whileInView:{ opacity: 1, y: 0, scale: 1.0 },
-  viewport:   { once: true, margin: "-50px" },
+  viewport:   { once: false, amount: 0.15 },
   transition: { duration: dur.reveal, delay, ease: ease.out },
+});
+
+/** Direction-Aware Card Entrance */
+export const directionalCardEntrance = (
+  direction: ScrollDirection = 'down',
+  delay = 0,
+  distance = 24
+) => ({
+  initial: {
+    opacity: 0,
+    y: direction === 'down' ? distance : -distance,
+    scale: 0.98,
+  },
+  whileInView: { opacity: 1, y: 0, scale: 1.0 },
+  viewport: { once: false, amount: 0.15 },
+  transition: { duration: dur.reveal, delay, ease: ease.out },
+});
+
+/** Direction-Aware Fade Up / Down */
+export const directionalFade = (
+  direction: ScrollDirection = 'down',
+  delay = 0,
+  distance = 18,
+  duration = dur.reveal
+) => ({
+  initial: {
+    opacity: 0,
+    y: direction === 'down' ? distance : -distance,
+  },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: false, amount: 0.15 },
+  transition: { duration, delay, ease: ease.out },
 });
 
 /** Subtle Hover Lift & Press Interaction */

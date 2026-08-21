@@ -19,6 +19,7 @@ import {
   useTransform,
   useSpring,
   useMotionValue,
+  useInView,
 } from "framer-motion";
 import { NAME, ROLE, ROTATING_TAGLINES, PROFILE_IMAGE, HERO_UI } from "../lib/data";
 import { ease } from "../lib/motion";
@@ -373,6 +374,8 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
 
   /* ── Refs ───────────────────────────────────────────────── */
   const sectionRef   = useRef<HTMLElement>(null);
+  const isHeroInView = useInView(sectionRef, { once: false, amount: 0.15 });
+  const shouldAnimate = ready && isHeroInView;
 
   /* ── Silhouette particle & rim beam refs ─────────────────── */
   const canvasRef      = useRef<HTMLCanvasElement | null>(null);
@@ -611,7 +614,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
           {/* ── Subtle Ambient Atmosphere Glow (fades in smoothly) ── */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={ready && !prefersReduced ? { opacity: 1 } : { opacity: 1 }}
+            animate={shouldAnimate && !prefersReduced ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
             className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-b from-white/[0.03] to-transparent rounded-full blur-[140px] pointer-events-none z-[1]"
           />
@@ -637,7 +640,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             {/* Stage 4 / Layer 1: Background Radial Glow (fades & expands softly after photo starts revealing) */}
             <motion.div
               initial={{ opacity: 0, scale: 0.82 }}
-              animate={ready && !prefersReduced ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1 }}
+              animate={shouldAnimate && !prefersReduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.82 }}
               transition={{ duration: 1.6, delay: 0.90, ease: [0.22, 1, 0.36, 1] }}
               className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] aspect-square bg-[radial-gradient(circle,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.01)_55%,transparent_72%)] rounded-full blur-[65px] pointer-events-none z-[1]"
             />
@@ -645,7 +648,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             {/* Stage 1 & 2 / Layer 2: Mask / Clip-Path Curtain Container */}
             <motion.div
               initial={!prefersReduced ? { clipPath: "inset(100% 0% 0% 0%)" } : { clipPath: "inset(0% 0% 0% 0%)" }}
-              animate={ready && !prefersReduced ? { clipPath: "inset(0% 0% 0% 0%)" } : { clipPath: "inset(0% 0% 0% 0%)" }}
+              animate={shouldAnimate && !prefersReduced ? { clipPath: "inset(0% 0% 0% 0%)" } : { clipPath: "inset(100% 0% 0% 0%)" }}
               transition={{ duration: 1.85, delay: 0.35, ease: [0.16, 1, 0.3, 1] as Bezier }}
               style={{
                 width: "100%",
@@ -662,7 +665,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                 alt={`${NAME} — ${ROLE}`}
                 crossOrigin="anonymous"
                 initial={!prefersReduced ? { y: 70, scale: 1.09, opacity: 0.2 } : { y: 0, scale: 1, opacity: 1 }}
-                animate={ready && !prefersReduced ? { y: 0, scale: 1.0, opacity: 1 } : { y: 0, scale: 1, opacity: 1 }}
+                animate={shouldAnimate && !prefersReduced ? { y: 0, scale: 1.0, opacity: 1 } : { y: 70, scale: 1.09, opacity: 0.2 }}
                 transition={{ duration: 2.0, delay: 0.35, ease: [0.16, 1, 0.3, 1] as Bezier }}
                 onLoad={e => {
                   const img = e.currentTarget as HTMLImageElement;
@@ -707,7 +710,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
                 ref={canvasRef}
                 aria-hidden="true"
                 initial={{ opacity: 0 }}
-                animate={ready && !prefersReduced ? { opacity: 1 } : { opacity: 1 }}
+                animate={shouldAnimate && !prefersReduced ? { opacity: 1 } : { opacity: 0 }}
                 transition={{ duration: 1.1, delay: 1.30, ease: "easeOut" }}
                 style={{
                   position: "absolute",
@@ -757,7 +760,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               <span className="overflow-hidden inline-block">
                 <motion.span
                   initial={{ y: "115%", opacity: 0 }}
-                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  animate={shouldAnimate && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "115%", opacity: 0 }}
                   transition={{ duration: 0.8, delay: 0.12, ease: [0.16, 1.0, 0.3, 1] }}
                   className="inline-block font-light"
                 >
@@ -768,7 +771,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               <span className="overflow-hidden inline-block">
                 <motion.span
                   initial={{ y: "115%", opacity: 0 }}
-                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  animate={shouldAnimate && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "115%", opacity: 0 }}
                   transition={{ duration: 0.8, delay: 0.24, ease: [0.16, 1.0, 0.3, 1] }}
                   className="inline-block font-light"
                 >
@@ -779,7 +782,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               <span className="overflow-hidden inline-block">
                 <motion.span
                   initial={{ y: "115%", opacity: 0 }}
-                  animate={ready && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "0%", opacity: 1 }}
+                  animate={shouldAnimate && !prefersReduced ? { y: "0%", opacity: 1 } : { y: "115%", opacity: 0 }}
                   transition={{ duration: 0.85, delay: 0.38, ease: [0.16, 1.0, 0.3, 1] }}
                   className="inline-block font-bold text-white"
                 >
@@ -791,7 +794,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
             {/* Rotating tagline — Masked Reveal */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
-              animate={ready && !prefersReduced ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+              animate={shouldAnimate && !prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
               transition={{ duration: 0.75, delay: T.role, ease: [0.16, 1.0, 0.3, 1] }}
               style={{ marginTop: "clamp(4px, 0.6vh, 8px)" }}
             >
@@ -816,7 +819,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
           >
             {/* Tech strip — 'Experienced in' with circular tech logo badges matching reference */}
             <motion.div
-              {...(ready && !prefersReduced ? fadeUp(0.72, 14) : {})}
+              {...(shouldAnimate && !prefersReduced ? fadeUp(0.72, 14) : { initial: { opacity: 0, y: 14 }, animate: { opacity: 0, y: 14 } })}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -924,7 +927,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               {/* Primary — with live animated specular rim light beam */}
               <motion.a
                 href="#projects"
-                {...(ready && !prefersReduced ? fadeUp(0.88, 16) : {})}
+                {...(shouldAnimate && !prefersReduced ? fadeUp(0.88, 16) : { initial: { opacity: 0, y: 16 }, animate: { opacity: 0, y: 16 } })}
                 onClick={e => {
                   e.preventDefault();
                   document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
@@ -971,7 +974,7 @@ export default function Hero({ cardBoxRefCallback }: HeroProps) {
               {/* Secondary — Contact */}
               <motion.a
                 href="#contact"
-                {...(ready && !prefersReduced ? fadeUp(1.0, 16) : {})}
+                {...(shouldAnimate && !prefersReduced ? fadeUp(1.0, 16) : { initial: { opacity: 0, y: 16 }, animate: { opacity: 0, y: 16 } })}
                 onClick={e => {
                   e.preventDefault();
                   document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
