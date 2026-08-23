@@ -6,6 +6,7 @@ export interface ProjectDetails {
   solution:    string;
   impact:      string;
   role:        string;
+  roleTitle?:  string;
   duration:    string;
   teamSize:    string;
   status:      string;
@@ -16,6 +17,10 @@ export interface ProjectDetails {
 export interface Project {
   slug:        string;
   title:       string;
+  category?:   string;
+  role?:       string;
+  badge?:      string;
+  badgeLabel?: string;
   description: string;
   tags:        string[];
   isFeatured?: boolean;
@@ -23,6 +28,7 @@ export interface Project {
   live?:       string;
   image?:      string;
   video?:      string;
+  accent?:     string;
   details?:    ProjectDetails;
 }
 

@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { ExternalLink, Github, ArrowUpRight, Sparkles } from 'lucide-react';
 import { PROJECTS } from '../lib/data';
 import { ease, dur } from '../lib/motion';
+import { useScrollDirection } from '../lib/useScrollDirection';
 
 /* ─────────────────────────────────────────────────────────────
    PROJECT METADATA
@@ -29,10 +30,10 @@ const PROJECT_META: Record<
   },
   'truck-singh': {
     category: 'Logistics Automation',
-    cleanTitle: 'Truck Singh — Logistics Platform',
-    cleanDescription: 'Full-stack logistics management platform serving 100+ active users across drivers, agents, and fleet owners.',
-    role: 'Role: Team Lead',
-    badge: 'UptoSkills Sprint',
+    cleanTitle: 'Truck Singh — Multi-Role Logistics & Fleet Management Platform',
+    cleanDescription: 'Full-stack Flutter logistics platform digitizing road freight with GPS tracking, geofenced status updates, digital bilty, GST invoices, and SOS alerts.',
+    role: 'Role: Core Contributor',
+    badge: 'Team Project',
   },
   'pcify': {
     category: 'Marketplace Engine',
@@ -154,10 +155,10 @@ function StackCard({
         "
       >
         {/* 2-Column Split Grid: Left Details (5 cols) | Right Media (7 cols) */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-end">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
           
-          {/* ── LEFT COLUMN: Minimal Classic Typography (Aligned to Bottom) ── */}
-          <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-end space-y-4 pb-1 sm:pb-2">
+          {/* ── LEFT COLUMN: Minimal Classic Typography (Aligned to Center) ── */}
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-center space-y-4 pb-1 sm:pb-2">
             
             {/* 1. Category / Brand line */}
             <div className="flex items-center gap-2 text-xs sm:text-[13px] text-white/70 font-medium tracking-wide">
@@ -223,17 +224,17 @@ function StackCard({
 
           </div>
 
-          {/* ── RIGHT COLUMN: Clean Media Preview (~25% Larger) ── */}
+          {/* ── RIGHT COLUMN: Full Media Preview (No Cropping) ── */}
           <div className="lg:col-span-7 xl:col-span-7 w-full flex items-center justify-center">
-            <div className="relative w-full aspect-[1.32] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-black/60 min-h-[300px] sm:min-h-[380px] md:min-h-[440px] lg:min-h-[480px] xl:min-h-[520px]">
+            <div className={`relative w-full ${project.video || project.slug === 'greenwave' ? 'aspect-video' : 'aspect-[16/10] sm:aspect-[16/9]'} rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-black/80 border border-white/10 group-hover:border-white/20 transition-all duration-300`}>
               {project.video || project.slug === 'greenwave' ? (
                 <video
-                  src={project.video || "/perfect_but_also_show_that_o.mp4"}
+                  src={project.video || "/GreenWaveVideo.mp4"}
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                  className="w-full h-full object-contain pointer-events-none"
                 />
               ) : hasImage ? (
                 <img
@@ -249,8 +250,6 @@ function StackCard({
                   </span>
                 </div>
               )}
-              {/* Subtle gradient vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
 
@@ -259,8 +258,6 @@ function StackCard({
     </article>
   );
 }
-
-import { useScrollDirection } from '../lib/useScrollDirection';
 
 /* ─────────────────────────────────────────────────────────────
    MAIN PROJECTS SECTION

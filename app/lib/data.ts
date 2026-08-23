@@ -12,12 +12,18 @@ import type { Project, FailureLog } from '../types';
 export const PROJECTS: Project[] = (portfolioConfig.projects || []).map((p: any) => ({
   slug:        p.slug,
   title:       p.title,
+  category:    p.category,
+  role:        p.role,
+  badge:       p.badge,
+  badgeLabel:  p.badgeLabel,
   description: p.description,
   tags:        p.tags,
   isFeatured:  p.isFeatured ?? false,
   github:      p.github,
   live:        p.live,
   image:       p.image,
+  video:       p.video,
+  accent:      p.accent,
   details:     p.details,
 }));
 
