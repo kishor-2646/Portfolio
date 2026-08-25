@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-serif: var(--font-serif), "Instrument Serif", "Playfair Display", Georgia, serif;
+}
+
 /* ─────────────────────────────────────────────────────────
    DESIGN TOKENS — Cinematic Monochrome
 ───────────────────────────────────────────────────────── */
@@ -208,11 +212,36 @@ body {
   z-index: 2 !important;
 }
 
+/* ─────────────────────────────────────────────────────────
+   ACHIEVEMENTS MARQUEE
+───────────────────────────────────────────────────────── */
+@keyframes achievements-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.333333%);
+  }
+}
+
+.animate-achievements-loop {
+  display: flex;
+  width: max-content;
+  animation: achievements-marquee 38s linear infinite;
+}
+
+.animate-achievements-loop:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rim-light::before,
   .border-beam::before {
     animation: none !important;
     opacity: 0.4 !important;
+  }
+  .animate-achievements-loop {
+    animation: none !important;
   }
 }
 

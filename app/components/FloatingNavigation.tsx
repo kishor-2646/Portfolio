@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, MotionValue } from "framer-motion";
-import { Menu, X, ArrowUpRight } from "lucide-react";
-import { MONOGRAM, RESUME_URL } from "../lib/data";
+import { Menu, X, ArrowUpRight, MoreHorizontal } from "lucide-react";
+import { MONOGRAM, RESUME_URL, NAME, PROFILE_IMAGE } from "../lib/data";
 
 /* ── Nav items in exact page order ──────────────────────── */
 const NAV_ITEMS = [
@@ -20,33 +20,28 @@ interface Props {
   setActiveSection: (id: string) => void;
 }
 
-/* ── Interactive Nav Link Button with Scroll-Driven Gap Compression ── */
+/* ── Spring Physics for Silky Smooth Navbar Morphing ─────── */
+const SMOOTH_NAV_SPRING = {
+  type: "spring" as const,
+  stiffness: 140,
+  damping: 22,
+  mass: 0.75,
+};
+
+/* ── Interactive Nav Link Button with Active Glass Pill ── */
 function NavLinkItem({
   item,
-  index,
-  total,
-  scrollY,
   activeSection,
   hoveredId,
   setHoveredId,
   scrollTo,
 }: {
   item: { id: string; label: string };
-  index: number;
-  total: number;
-  scrollY: MotionValue<number>;
   activeSection: string;
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
   scrollTo: (id: string) => void;
 }) {
-  // Center anchor point
-  const mid = (total - 1) / 2;
-  const initialOffset = (index - mid) * 8.5; // subtle spread at top
-
-  const rawX = useTransform(scrollY, [0, 160], [initialOffset, 0]);
-  const springX = useSpring(rawX, { stiffness: 240, damping: 28, mass: 0.15 });
-
   const isActive = activeSection === item.id;
   const isHovered = hoveredId === item.id;
 
@@ -57,12 +52,8 @@ function NavLinkItem({
       onClick={() => scrollTo(item.id)}
       onMouseEnter={() => setHoveredId(item.id)}
       onMouseLeave={() => setHoveredId(null)}
-      style={{
-        x: springX,
-        willChange: "transform",
-      }}
       className={`
-        relative px-3.5 py-1.5 rounded-full text-[13.5px] font-normal
+        relative px-3 py-1.5 rounded-full text-[13px] font-normal
         transition-colors duration-200 cursor-pointer select-none
         ${
           isActive
@@ -80,7 +71,7 @@ function NavLinkItem({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.15 }}
+          transition={{ duration: 0.18 }}
           className="absolute inset-0 rounded-full bg-white/[0.08] pointer-events-none"
         />
       )}
@@ -89,7 +80,7 @@ function NavLinkItem({
       {isActive && (
         <motion.span
           layoutId="nav-active-pill"
-          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+          transition={{ type: "spring", stiffness: 350, damping: 30 }}
           className="
             absolute inset-0 rounded-full
             bg-white/[0.14] border border-white/20
@@ -105,31 +96,58 @@ function NavLinkItem({
 }
 
 export default function FloatingNavigation({ activeSection, setActiveSection }: Props) {
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [mounted, setMounted]     = useState(false);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  // Separation gap for logo and resume (140px)
-  const sideOffset = 140;
+  const [menuOpen, setMenuOpen]             = useState(false);
+  const [mounted, setMounted]               = useState(false);
+  const [hoveredId, setHoveredId]           = useState<string | null>(null);
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  /* ── Scroll-driven 1:1 continuous interpolation ───────────── */
-  const { scrollY } = useScroll();
+  /* ── Direction-Aware Scroll Detection with Hysteresis Smoothing ── */
+  useEffect(() => {
+    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    let accumulatedDelta = 0;
 
-  // Scroll range: 0px to 160px of vertical scroll
-  const rawLogoX = useTransform(scrollY, [0, 160], [-sideOffset, 0]);
-  const rawResumeX = useTransform(scrollY, [0, 160], [sideOffset, 0]);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
 
-  // Spring smoothing for organic physical feel
-  const springCfg = { stiffness: 240, damping: 28, mass: 0.15 };
-  const logoX = useSpring(rawLogoX, springCfg);
-  const resumeX = useSpring(rawResumeX, springCfg);
+      // Near top of page: always expand smoothly
+      if (currentScrollY < 70) {
+        setIsScrolledDown(false);
+        accumulatedDelta = 0;
+        lastScrollY = currentScrollY;
+        return;
+      }
 
-  // Border & Glass opacities interpolate directly with scroll
-  const glassOpacity = useTransform(scrollY, [50, 160], [0, 1]);
+      // Reset accumulated delta on direction change
+      if ((delta > 0 && accumulatedDelta < 0) || (delta < 0 && accumulatedDelta > 0)) {
+        accumulatedDelta = 0;
+      }
+      accumulatedDelta += delta;
+
+      // Scrolling Down threshold (smooth 18px accumulation)
+      if (accumulatedDelta > 18) {
+        setIsScrolledDown(true);
+        accumulatedDelta = 0;
+      }
+      // Scrolling Up threshold (smooth 18px accumulation)
+      else if (accumulatedDelta < -18) {
+        setIsScrolledDown(false);
+        accumulatedDelta = 0;
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isCollapsed = isScrolledDown && !isHoverExpanded;
 
   const scrollTo = (id: string) => {
     setActiveSection(id);
@@ -140,17 +158,25 @@ export default function FloatingNavigation({ activeSection, setActiveSection }: 
     }
   };
 
+  const displayName = (NAME ? NAME.split(" ")[0] : "KISHOR").toUpperCase();
+
   return (
     <>
       {/* ── Fixed Center Anchor Wrapper ── */}
       <div className="fixed top-5 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
         
-        {/* Floating Nav Pill Container with Premium Refractive Glass Effect */}
+        {/* Floating Nav Pill Container with Silky Physics Morphing */}
         <motion.nav
+          layout
           aria-label="Main navigation"
           initial={{ opacity: 0, y: -16 }}
           animate={mounted ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
-          transition={{ duration: 0.5, ease: [0.22, 1.0, 0.36, 1.0] }}
+          onMouseEnter={() => setIsHoverExpanded(true)}
+          onMouseLeave={() => setIsHoverExpanded(false)}
+          transition={{
+            layout: SMOOTH_NAV_SPRING,
+            opacity: { duration: 0.4 },
+          }}
           className="
             pointer-events-auto
             relative inline-flex items-center
@@ -158,12 +184,13 @@ export default function FloatingNavigation({ activeSection, setActiveSection }: 
             whitespace-nowrap
           "
         >
-          {/* Animated Frosted Glass Layer matching Reference Image */}
+          {/* Frosted Glass Background Layer (Synchronized Morph) */}
           <motion.div
+            layout
+            transition={{ layout: SMOOTH_NAV_SPRING }}
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              opacity: glassOpacity,
-              background: "linear-gradient(180deg, rgba(38, 38, 38, 0.45) 0%, rgba(16, 16, 16, 0.32) 100%)",
+              background: "linear-gradient(180deg, rgba(38, 38, 38, 0.48) 0%, rgba(14, 14, 14, 0.36) 100%)",
               backdropFilter: "blur(32px) saturate(190%)",
               WebkitBackdropFilter: "blur(32px) saturate(190%)",
               border: "1px solid rgba(255, 255, 255, 0.14)",
@@ -172,92 +199,135 @@ export default function FloatingNavigation({ activeSection, setActiveSection }: 
             }}
           />
 
-          {/* Monogram Logo (Glass badge) */}
+          {/* Identity Capsule: Avatar + Name (Always Visible) */}
           <motion.button
+            layout
+            transition={{ layout: SMOOTH_NAV_SPRING }}
             onClick={() => scrollTo("hero")}
             aria-label="Back to top"
-            style={{
-              x: mounted ? logoX : 0,
-              willChange: "transform",
-            }}
             className="
-              relative z-10
-              flex items-center justify-center
-              w-8 h-8 rounded-full
-              bg-white/[0.08] hover:bg-white/[0.15]
-              border border-white/20
-              shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)]
-              text-white font-bold text-xs tracking-tight
-              transition-colors duration-200 hover:scale-105 active:scale-95 shrink-0
+              relative z-10 flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full
+              hover:bg-white/[0.08] transition-colors duration-200 cursor-pointer select-none shrink-0
             "
           >
-            {MONOGRAM || "K"}
+            {/* Circular Avatar / Monogram */}
+            <div className="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-zinc-800 flex items-center justify-center shrink-0 shadow-inner">
+              {PROFILE_IMAGE ? (
+                <img
+                  src={PROFILE_IMAGE}
+                  alt={NAME}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <span className="text-white font-bold text-xs">{MONOGRAM || "K"}</span>
+              )}
+            </div>
+
+            {/* User Name */}
+            <span className="text-[13px] font-bold text-white tracking-wide uppercase">
+              {displayName}
+            </span>
           </motion.button>
 
-          {/* Divider between Logo & Links (Desktop) */}
-          <motion.div
-            style={{ opacity: glassOpacity }}
-            className="hidden md:block w-px h-4 bg-white/15 mx-1.5 pointer-events-none relative z-10"
-          />
+          {/* ── EXPANDED DESKTOP VIEW (Visible on Scroll Up / Top) ── */}
+          <AnimatePresence mode="wait">
+            {!isCollapsed && (
+              <motion.div
+                key="expanded-links-container"
+                layout
+                initial={{ opacity: 0, width: 0, filter: "blur(6px)" }}
+                animate={{ opacity: 1, width: "auto", filter: "blur(0px)" }}
+                exit={{ opacity: 0, width: 0, filter: "blur(6px)" }}
+                transition={{
+                  width: SMOOTH_NAV_SPRING,
+                  opacity: { duration: 0.35, ease: "easeInOut" },
+                  filter: { duration: 0.35 },
+                }}
+                className="relative z-10 hidden md:flex items-center overflow-hidden"
+              >
+                {/* Divider */}
+                <div className="w-px h-4 bg-white/15 mx-1.5 pointer-events-none shrink-0" />
 
-          {/* Center Nav Links (Glass container) */}
-          <div className="relative z-10 hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map((item, index) => (
-              <NavLinkItem
-                key={item.id}
-                item={item}
-                index={index}
-                total={NAV_ITEMS.length}
-                scrollY={scrollY}
-                activeSection={activeSection}
-                hoveredId={hoveredId}
-                setHoveredId={setHoveredId}
-                scrollTo={scrollTo}
-              />
-            ))}
-          </div>
+                {/* Navigation Links */}
+                <div className="flex items-center gap-0.5 shrink-0">
+                  {NAV_ITEMS.map((item) => (
+                    <NavLinkItem
+                      key={item.id}
+                      item={item}
+                      activeSection={activeSection}
+                      hoveredId={hoveredId}
+                      setHoveredId={setHoveredId}
+                      scrollTo={scrollTo}
+                    />
+                  ))}
+                </div>
 
-          {/* Divider between Links & Resume (Desktop) */}
-          <motion.div
-            style={{ opacity: glassOpacity }}
-            className="hidden md:block w-px h-4 bg-white/15 mx-1.5 pointer-events-none relative z-10"
-          />
+                {/* Divider */}
+                <div className="w-px h-4 bg-white/15 mx-1.5 pointer-events-none shrink-0" />
 
-          {/* Resume Button (Glass button — synchronized velocity with Logo) */}
-          <motion.a
-            href={RESUME_URL || "/resume.pdf"}
-            target="_blank"
-            rel="noopener noreferrer"
+                {/* Resume Button */}
+                <motion.a
+                  href={RESUME_URL || "/resume.pdf"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+                    relative z-10 inline-flex items-center gap-1
+                    px-3 py-1.5 rounded-full
+                    text-[12.5px] font-medium text-white/85 hover:text-white
+                    bg-white/[0.08] hover:bg-white/[0.16]
+                    border border-white/15 hover:border-white/30
+                    shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]
+                    transition-colors duration-200 shrink-0 mr-0.5
+                  "
+                >
+                  <span>Resume</span>
+                  <ArrowUpRight size={13} />
+                </motion.a>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            style={{
-              x: mounted ? resumeX : 0,
-              willChange: "transform",
-            }}
-            className="
-              relative z-10
-              hidden md:inline-flex items-center gap-1
-              px-3.5 py-1.5 rounded-full
-              text-[12.5px] font-medium text-white/85 hover:text-white
-              bg-white/[0.08] hover:bg-white/[0.16]
-              border border-white/15 hover:border-white/30
-              shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]
-              transition-colors duration-200 shrink-0
-            "
-          >
-            <span>Resume</span>
-            <ArrowUpRight size={13} />
-          </motion.a>
+          {/* ── COLLAPSED DESKTOP VIEW: Three Dots (Visible on Scroll Down) ── */}
+          <AnimatePresence mode="wait">
+            {isCollapsed && (
+              <motion.button
+                key="collapsed-dots-btn"
+                layout
+                initial={{ opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                transition={{
+                  scale: SMOOTH_NAV_SPRING,
+                  opacity: { duration: 0.3 },
+                }}
+                onClick={() => setMenuOpen(prev => !prev)}
+                aria-label="Open menu"
+                className="
+                  hidden md:flex relative z-10 items-center justify-center
+                  w-7 h-7 rounded-full
+                  bg-white/[0.06] hover:bg-white/[0.15] text-white/80 hover:text-white
+                  border border-white/10 hover:border-white/25
+                  transition-all duration-200 cursor-pointer shrink-0 ml-1 mr-0.5
+                "
+              >
+                <MoreHorizontal size={15} />
+              </motion.button>
+            )}
+          </AnimatePresence>
 
-          {/* Mobile Hamburger Toggle */}
+          {/* Mobile Hamburger Toggle (Always available on small screens) */}
           <button
             id="nav-mobile-toggle"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             className="
               relative z-10 md:hidden flex items-center justify-center
-              w-8 h-8 rounded-full
+              w-7 h-7 rounded-full
               bg-white/10 text-white/80 hover:text-white
-              transition-colors shrink-0 ml-1.5
+              transition-colors shrink-0 ml-1.5 mr-0.5
             "
           >
             {menuOpen ? <X size={15} /> : <Menu size={15} />}
@@ -266,18 +336,18 @@ export default function FloatingNavigation({ activeSection, setActiveSection }: 
 
       </div>
 
-      {/* ── Mobile Dropdown Menu ── */}
+      {/* ── Dropdown Menu (Accessible when clicking three dots or on Mobile) ── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.96 }}
-            transition={{ duration: 0.2, ease: [0.22, 1.0, 0.36, 1.0] }}
+            transition={{ duration: 0.25, ease: [0.22, 1.0, 0.36, 1.0] }}
             className="
               fixed top-20 left-1/2 -translate-x-1/2 z-40
               w-[90%] max-w-[280px] p-2 rounded-2xl
-              bg-[#121212]/80 backdrop-blur-3xl
+              bg-[#121212]/90 backdrop-blur-3xl
               border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.85)]
               flex flex-col gap-1
             "
@@ -302,7 +372,7 @@ export default function FloatingNavigation({ activeSection, setActiveSection }: 
             <div className="h-px bg-white/10 my-1 mx-2" />
 
             <a
-              href="/resume.pdf"
+              href={RESUME_URL || "/resume.pdf"}
               target="_blank"
               rel="noopener noreferrer"
               className="

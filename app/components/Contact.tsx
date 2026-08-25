@@ -8,6 +8,8 @@ import portfolioConfig from '../../portfolio.config';
 import { ease } from '../lib/motion';
 import { useScrollDirection } from '../lib/useScrollDirection';
 
+import AnimatedSectionHeader from './AnimatedSectionHeader';
+
 /* ─────────────────────────────────────────────────────────────
    ULTRA-MINIMALIST MONOCHROME CONTACT SECTION
    - Matching reference image style:
@@ -28,34 +30,17 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative w-full py-32 sm:py-44 px-4 sm:px-6 md:px-8 text-white bg-black select-none overflow-hidden"
+      className="relative w-full py-44 sm:py-60 px-4 sm:px-6 md:px-8 text-white bg-black select-none overflow-hidden border-t border-white/5"
     >
       <div className="w-[96%] max-w-4xl mx-auto text-center space-y-12 sm:space-y-16">
         
-        {/* ── Heading matching Reference Style ("Contributed with Impact") ── */}
-        <div className="space-y-4">
-          <div className="overflow-hidden">
-            <motion.h2
-              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
-              whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.85, ease: ease.cinematic }}
-              className="font-serif italic text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] text-white/95 font-normal tracking-tight leading-tight"
-            >
-              Let&apos;s build something exceptional.
-            </motion.h2>
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0, y: scrollDirection === 'down' ? 10 : -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: ease.out }}
-            className="text-white/45 text-sm sm:text-base md:text-lg max-w-lg mx-auto font-light leading-relaxed tracking-wide"
-          >
-            {portfolioConfig.contact?.subheading || "Open to full-time engineering roles, internships, and high-impact systems."}
-          </motion.p>
-        </div>
+        {/* ── Heading matching Journey Section Style ── */}
+        <AnimatedSectionHeader
+          kicker="GET IN TOUCH"
+          title={portfolioConfig.contact?.heading || "Let's build something exceptional."}
+          subtitle={portfolioConfig.contact?.subheading || "Open to high-impact full-time roles, internships, and innovative contract systems."}
+          align="center"
+        />
 
         {/* ── Primary Email Link (Muted Greyish Typography) ── */}
         <motion.div

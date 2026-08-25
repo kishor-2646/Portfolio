@@ -19,7 +19,7 @@ export default function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, ease: ease.out }}
-      className="w-full py-12 pb-16 bg-black text-white/50 text-center select-none border-t border-white/[0.06]"
+      className="w-full py-16 pb-24 bg-black text-white/50 text-center select-none border-t border-white/[0.06]"
     >
       <div className="max-w-4xl mx-auto px-4 space-y-3">
         

@@ -527,6 +527,13 @@ const portfolioConfig = {
       "Write code for the next engineer who will debug it at 2 AM.",
     ],
 
+    // Right Column Note (Fills the grid symmetrically)
+    rightCompactNote: {
+      title: "API Protocols: REST vs gRPC & WebSockets",
+      description: "Serialization overhead, payload benchmarks, and event-stream latency for real-time mobile apps.",
+      category: "Network & Systems",
+    },
+
     // Bottom Wide Cards
     bottomCards: [
       {

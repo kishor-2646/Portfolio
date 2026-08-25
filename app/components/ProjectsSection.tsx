@@ -7,6 +7,7 @@ import { ExternalLink, Github, ArrowUpRight, Sparkles } from 'lucide-react';
 import { PROJECTS } from '../lib/data';
 import { ease, dur } from '../lib/motion';
 import { useScrollDirection } from '../lib/useScrollDirection';
+import AnimatedSectionHeader from './AnimatedSectionHeader';
 
 /* ─────────────────────────────────────────────────────────────
    PROJECT METADATA
@@ -283,45 +284,17 @@ export default function ProjectsSection() {
     <section
       id="projects"
       ref={containerRef}
-      className="relative w-full text-white pt-24 sm:pt-32 pb-20 overflow-visible"
+      className="relative w-full text-white pt-36 sm:pt-48 pb-32 sm:pb-44 overflow-visible"
       style={{ background: '#000000' }}
     >
-      {/* Section Heading Container with Masked Title Reveal */}
-      <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 mb-12 sm:mb-16">
-        <div className="space-y-3">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: scrollDirection === 'down' ? 10 : -10 }}
-            whileInView={{ opacity: 1, scale: 1.0, y: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.55, ease: ease.out }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/5 text-white/70 text-xs font-bold tracking-[0.2em] uppercase"
-          >
-            <Sparkles size={13} className="text-white/70" />
-            Featured Work
-          </motion.div>
-
-          <div className="overflow-hidden">
-            <motion.h2
-              initial={{ y: scrollDirection === 'down' ? "100%" : "-100%", opacity: 0 }}
-              whileInView={{ y: "0%", opacity: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.75, delay: 0.08, ease: ease.cinematic }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight"
-            >
-              Selected Projects
-            </motion.h2>
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0, y: scrollDirection === 'down' ? 16 : -16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.65, delay: 0.2, ease: ease.out }}
-            className="max-w-2xl text-base sm:text-lg text-white/60 leading-relaxed font-light"
-          >
-            Production-grade systems, real-time architectures, and hackathon-winning solutions built under real-world constraints.
-          </motion.p>
-        </div>
+      {/* Section Heading Container with Animated Character Reveal */}
+      <div className="w-[96%] max-w-[1680px] mx-auto px-3 sm:px-6 md:px-8 mb-16 sm:mb-20">
+        <AnimatedSectionHeader
+          kicker="FEATURED WORK"
+          title="Selected Projects"
+          subtitle="Production-grade systems, real-time architectures, and hackathon-winning solutions built under real-world constraints."
+          align="left"
+        />
       </div>
 
       {/* Stacking Cards List — Simultaneous Smooth Fade-Out Exit */}
