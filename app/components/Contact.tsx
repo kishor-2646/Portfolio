@@ -30,7 +30,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative w-full py-44 sm:py-60 px-4 sm:px-6 md:px-8 text-white bg-black select-none overflow-hidden border-t border-white/5"
+      className="relative w-full py-60 sm:py-80 lg:py-96 px-4 sm:px-6 md:px-8 text-white bg-black select-none overflow-hidden border-t border-white/5"
     >
       <div className="w-[96%] max-w-4xl mx-auto text-center space-y-12 sm:space-y-16">
         

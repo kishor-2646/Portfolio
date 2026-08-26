@@ -284,7 +284,7 @@ export default function ProjectsSection() {
     <section
       id="projects"
       ref={containerRef}
-      className="relative w-full text-white pt-36 sm:pt-48 pb-32 sm:pb-44 overflow-visible"
+      className="relative w-full text-white pt-52 sm:pt-72 lg:pt-80 pb-52 sm:pb-72 lg:pb-80 overflow-visible border-t border-white/5"
       style={{ background: '#000000' }}
     >
       {/* Section Heading Container with Animated Character Reveal */}

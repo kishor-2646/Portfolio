@@ -46,7 +46,7 @@ export default function AboutSection() {
     <section
       id="about"
       ref={containerRef}
-      className="relative w-full min-h-screen flex items-center justify-start text-white overflow-hidden pt-44 pb-24 sm:pt-56 sm:pb-32 md:pt-64 md:pb-36 lg:pt-72 lg:pb-40 px-6 sm:px-10 md:px-16 lg:px-24"
+      className="relative w-full min-h-screen flex items-center justify-start text-white overflow-hidden pt-60 pb-48 sm:pt-72 sm:pb-60 md:pt-80 md:pb-72 lg:pt-96 lg:pb-80 px-6 sm:px-10 md:px-16 lg:px-24 border-t border-white/5"
       style={{ background: "#000000" }}
     >
       <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">

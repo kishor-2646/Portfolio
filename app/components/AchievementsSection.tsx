@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ExternalLink, FileText, Image as ImageIcon } from 'lucide-react';
 import { useScrollDirection } from '../lib/useScrollDirection';
@@ -13,6 +13,20 @@ interface CertificateFile {
   name: string;
   path: string;
   type: 'pdf' | 'image';
+  previewImage?: string;
+}
+
+/**
+ * Returns the direct visual preview image path for any certificate file (PDF or Image)
+ */
+function getCertificatePreviewImage(cert: CertificateFile): string {
+  if (cert.type === 'image' || cert.path.match(/\.(jpeg|jpg|png|webp|gif)$/i)) {
+    return cert.path;
+  }
+  // Convert /Achievements/foo/bar.pdf -> /Achievements/previews/foo_bar.png
+  const cleanPath = cert.path.replace(/^\/Achievements\//, '');
+  const previewFilename = cleanPath.replace(/[/\\]/g, '_').replace(/ /g, '_').replace(/\.pdf$/i, '.png');
+  return `/Achievements/previews/${previewFilename}`;
 }
 
 export interface BadgeItem {
@@ -722,17 +736,23 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
 export default function AchievementsSection() {
   const scrollDirection = useScrollDirection();
   const [selectedBadge, setSelectedBadge] = useState<BadgeItem>(BADGES_LIST[0]);
+  const [activeCertIndex, setActiveCertIndex] = useState(0);
+
+  // Reset active certificate preview when selected badge changes
+  useEffect(() => {
+    setActiveCertIndex(0);
+  }, [selectedBadge.id]);
 
   return (
     <section
       id="achievements"
-      className="relative w-full py-36 sm:py-48 bg-black text-white overflow-hidden border-t border-white/5"
+      className="relative w-full py-52 sm:py-72 lg:py-80 bg-black text-white overflow-hidden border-t border-white/5"
     >
       {/* ── Background Vignette & Ambient Glow ── */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
 
       {/* ── Section Header with Animated Character Reveal ── */}
-      <div className="max-w-4xl mx-auto px-6 sm:px-8 text-center mb-16 sm:mb-20">
+      <div className="max-w-5xl mx-auto px-6 sm:px-8 text-center mb-12 sm:mb-14">
         <AnimatedSectionHeader
           kicker="HONORS & RECOGNITION"
           title="Achievements"
@@ -741,152 +761,260 @@ export default function AchievementsSection() {
         />
       </div>
 
-      {/* ── Badges Row / Showcase ── */}
-      <motion.div
-        initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.2 }}
-        transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-6xl mx-auto px-6 sm:px-8 mb-12"
-      >
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 lg:gap-10">
-          {BADGES_LIST.map((badge) => {
-            const isSelected = selectedBadge.id === badge.id;
+      {/* ── 2-Column Split: Scrollable Badges Window on Left | Details Card on Right ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-            return (
-              <motion.button
-                key={badge.id}
-                onClick={() => setSelectedBadge(badge)}
-                whileHover={{ y: -8, scale: 1.06 }}
-                whileTap={{ scale: 0.96 }}
-                transition={{ duration: 0.25, ease: [0.22, 1.0, 0.36, 1.0] }}
-                className={`
-                  relative group flex flex-col items-center cursor-pointer p-2 rounded-2xl transition-all duration-300
-                  ${isSelected ? 'bg-white/[0.06] shadow-[0_0_30px_rgba(255,255,255,0.12)] ring-1 ring-white/30' : 'hover:bg-white/[0.03]'}
-                `}
-                aria-label={`View ${badge.title}`}
-              >
-                {isSelected && (
-                  <motion.div
-                    layoutId="active-badge-indicator"
-                    className="absolute -top-2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)]"
-                  />
-                )}
-                <BadgeGraphic badge={badge} />
-                <span className="mt-2 text-[11px] font-semibold text-white/50 group-hover:text-white/90 transition-colors text-center max-w-[110px] truncate">
-                  {badge.issuer}
-                </span>
-              </motion.button>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* ── Active Badge Details Drawer (Frosted Glass Panel) ── */}
-      <div className="max-w-3xl mx-auto px-6 sm:px-8">
-        <AnimatePresence mode="wait">
+          {/* ── LEFT COLUMN: Scrollable Badges Gallery (Seamless Black Background) ── */}
           <motion.div
-            key={selectedBadge.id}
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.98 }}
-            transition={{ duration: 0.3, ease: [0.22, 1.0, 0.36, 1.0] }}
-            style={{
-              background: 'linear-gradient(180deg, rgba(38, 38, 38, 0.48) 0%, rgba(14, 14, 14, 0.38) 100%)',
-              backdropFilter: 'blur(28px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-              boxShadow: 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4), 0 20px 48px rgba(0, 0, 0, 0.85)',
-            }}
-            className="rounded-2xl p-6 sm:p-7 border border-white/[0.14] text-center sm:text-left"
+            initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.15 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full lg:col-span-7 flex flex-col bg-transparent overflow-hidden"
           >
-            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 pb-4 border-b border-white/[0.08]">
-              <div>
-                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5">
-                  <span className="text-[10.5px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-white/[0.08] text-white/90 border border-white/15">
-                    {selectedBadge.category}
-                  </span>
-                  <span className="text-xs font-semibold text-white/40 font-mono">
-                    {selectedBadge.year}
-                  </span>
+            {/* Minimal Header Bar on Black */}
+            <div className="flex items-center justify-between px-2 sm:px-3 py-2.5 mb-2 border-b border-white/[0.07] bg-transparent">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-white/30" />
+                  <span className="w-2 h-2 rounded-full bg-white/30" />
+                  <span className="w-2 h-2 rounded-full bg-white/30" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">
-                  {selectedBadge.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-white/50 font-medium mt-0.5">
-                  Awarded by {selectedBadge.issuer}
-                </p>
+                <span className="text-xs font-bold uppercase tracking-wider text-white/60 font-mono">
+                  Badges Gallery
+                </span>
               </div>
 
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium shrink-0">
-                <CheckCircle2 size={14} />
-                <span>Verified Credential</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-white/[0.05] text-white/50 border border-white/10">
+                  {BADGES_LIST.length} Badges
+                </span>
+                <span className="hidden sm:inline-block text-[11px] text-white/30 font-mono">
+                  Scroll inside ↓
+                </span>
               </div>
             </div>
 
-            {/* Description */}
-            <p className="text-xs sm:text-[13px] text-white/75 leading-relaxed my-4">
-              {selectedBadge.highlight}
-            </p>
+            {/* Scrollable Badges Grid Container (Transparent background, floating badges) */}
+            <div className="h-[480px] sm:h-[560px] lg:h-[620px] overflow-y-auto custom-scrollbar p-2 sm:p-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4 justify-items-center">
+                {BADGES_LIST.map((badge) => {
+                  const isSelected = selectedBadge.id === badge.id;
 
-            {/* ── Certificate Files List with View/Open Links ── */}
-            {selectedBadge.certificates.length > 0 && (
-              <div className="my-4 space-y-2">
-                <p className="text-[10.5px] uppercase tracking-wider text-white/40 font-semibold mb-2">
-                  {selectedBadge.certificates.length === 1 ? 'Certificate / Document' : `Certificates & Media (${selectedBadge.certificates.length})`}
-                </p>
-                <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
-                  {selectedBadge.certificates.map((cert, idx) => (
-                    <a
-                      key={idx}
-                      href={cert.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/cert flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/20 transition-all duration-200 cursor-pointer"
+                  return (
+                    <motion.button
+                      key={badge.id}
+                      onClick={() => setSelectedBadge(badge)}
+                      whileHover={{ y: -5, scale: 1.05 }}
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ duration: 0.2, ease: [0.22, 1.0, 0.36, 1.0] }}
+                      className={`
+                        relative group flex flex-col items-center cursor-pointer p-2.5 rounded-2xl transition-all duration-300 w-full max-w-[155px]
+                        ${isSelected ? 'bg-white/[0.08] shadow-[0_0_28px_rgba(255,255,255,0.14)] ring-1 ring-white/35' : 'hover:bg-white/[0.03]'}
+                      `}
+                      aria-label={`View ${badge.title}`}
                     >
-                      <div className="shrink-0 w-7 h-7 rounded-md bg-white/[0.06] border border-white/10 flex items-center justify-center">
-                        {cert.type === 'image' ? (
-                          <ImageIcon size={13} className="text-white/50" />
-                        ) : (
-                          <FileText size={13} className="text-white/50" />
-                        )}
-                      </div>
-                      <span className="text-xs text-white/70 group-hover/cert:text-white/95 transition-colors font-medium truncate flex-1">
-                        {cert.name}
+                      {isSelected && (
+                        <motion.div
+                          layoutId="active-badge-indicator"
+                          className="absolute -top-1.5 w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,1)]"
+                        />
+                      )}
+                      <BadgeGraphic badge={badge} />
+                      <span className="mt-2 text-[11px] font-semibold text-white/60 group-hover:text-white/95 transition-colors text-center w-full truncate">
+                        {badge.issuer}
                       </span>
-                      <span className="text-[10px] text-white/30 uppercase font-mono shrink-0">
-                        {cert.type === 'image' ? 'IMG' : 'PDF'}
-                      </span>
-                      <ExternalLink size={12} className="text-white/30 group-hover/cert:text-white/60 transition-colors shrink-0" />
-                    </a>
-                  ))}
-                </div>
+                    </motion.button>
+                  );
+                })}
               </div>
-            )}
-
-            {/* ── Certificate Image Preview (for single image documents) ── */}
-            {selectedBadge.certificates.length === 1 && selectedBadge.certificates[0].type === 'image' && (
-              <div className="my-4 rounded-lg overflow-hidden border border-white/[0.08] bg-black/40">
-                <img
-                  src={selectedBadge.certificates[0].path}
-                  alt={selectedBadge.certificates[0].name}
-                  className="w-full h-auto max-h-[300px] object-contain"
-                />
-              </div>
-            )}
-
-            {/* Solid Matte Tag Badges */}
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 pt-3 border-t border-white/[0.08]">
-              {selectedBadge.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className={`text-[10.5px] px-2.5 py-0.5 rounded-[3px] font-medium border text-center ${getTagStyle(tag)}`}
-                >
-                  {tag}
-                </span>
-              ))}
             </div>
           </motion.div>
-        </AnimatePresence>
+
+          {/* ── RIGHT COLUMN: Sticky Active Badge Details Inspector Window ── */}
+          <div className="w-full lg:col-span-5 lg:sticky lg:top-24 z-10">
+            <div
+              style={{
+                background: 'linear-gradient(180deg, rgba(32, 32, 32, 0.52) 0%, rgba(12, 12, 12, 0.42) 100%)',
+                backdropFilter: 'blur(28px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+                boxShadow: 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4), 0 20px 48px rgba(0, 0, 0, 0.85)',
+              }}
+              className="rounded-2xl border border-white/[0.12] overflow-hidden flex flex-col"
+            >
+              {/* Details Window Header Bar */}
+              <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/[0.08] bg-white/[0.02]">
+                <span className="text-xs font-bold uppercase tracking-wider text-white/70 font-mono">
+                  Credential Inspector
+                </span>
+                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-medium shrink-0">
+                  <CheckCircle2 size={13} />
+                  <span>Verified Credential</span>
+                </div>
+              </div>
+
+              {/* Details Content (Scrollable) */}
+              <div className="max-h-[480px] sm:max-h-[560px] lg:max-h-[620px] overflow-y-auto custom-scrollbar p-5 sm:p-6 text-left">
+                <AnimatePresence mode="wait">
+                  {(() => {
+                    const certs = selectedBadge.certificates;
+                    const activeIndex = Math.min(activeCertIndex, Math.max(0, certs.length - 1));
+                    const activeCert = certs[activeIndex] || certs[0];
+                    const activePreviewImg = activeCert ? getCertificatePreviewImage(activeCert) : null;
+
+                    return (
+                      <motion.div
+                        key={selectedBadge.id}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1.0, 0.36, 1.0] }}
+                      >
+                        {/* Header Info */}
+                        <div className="pb-3.5 border-b border-white/[0.08]">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-[10.5px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider bg-white/[0.08] text-white/90 border border-white/15">
+                              {selectedBadge.category}
+                            </span>
+                            <span className="text-xs font-semibold text-white/40 font-mono">
+                              {selectedBadge.year}
+                            </span>
+                          </div>
+                          <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">
+                            {selectedBadge.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-white/50 font-medium mt-0.5">
+                            Awarded by {selectedBadge.issuer}
+                          </p>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs sm:text-[13px] text-white/75 leading-relaxed my-3.5">
+                          {selectedBadge.highlight}
+                        </p>
+
+                        {/* ── Direct Visual Preview Card (PDFs & Images rendered visibly!) ── */}
+                        {activeCert && activePreviewImg && (
+                          <div className="my-4 space-y-2">
+                            <div className="flex items-center justify-between text-[10.5px] uppercase tracking-wider text-white/50 font-semibold">
+                              <span className="flex items-center gap-1.5">
+                                <ImageIcon size={12} className="text-white/60" />
+                                <span>Certificate & Document Preview</span>
+                              </span>
+                              <span className="text-[10px] font-mono text-white/40">
+                                {certs.length > 1 ? `${activeIndex + 1} of ${certs.length}` : (activeCert.type === 'image' ? 'IMAGE' : 'PDF')}
+                              </span>
+                            </div>
+
+                            {/* Main Active Certificate Preview Card */}
+                            <a
+                              href={activeCert.path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group/main-preview block relative rounded-xl overflow-hidden border border-white/15 bg-black/60 hover:border-white/40 transition-all duration-300 shadow-xl"
+                            >
+                              <div className="relative overflow-hidden bg-black/50 flex items-center justify-center min-h-[160px] max-h-[250px] p-1.5">
+                                <img
+                                  src={activePreviewImg}
+                                  alt={activeCert.name}
+                                  className="w-full h-auto max-h-[240px] object-contain mx-auto group-hover/main-preview:scale-[1.02] transition-transform duration-300 rounded-lg shadow-md"
+                                  loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover/main-preview:opacity-100 transition-opacity flex items-end justify-between p-3">
+                                  <span className="text-xs font-semibold text-white flex items-center gap-1.5 drop-shadow">
+                                    <ExternalLink size={13} /> Open full {activeCert.type === 'image' ? 'image' : 'PDF'}
+                                  </span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-mono uppercase backdrop-blur-md">
+                                    {activeCert.type === 'image' ? 'IMG' : 'PDF'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="px-3 py-2 bg-white/[0.04] border-t border-white/10 flex items-center justify-between">
+                                <span className="text-xs text-white/85 font-medium truncate">
+                                  {activeCert.name}
+                                </span>
+                                <span className="text-[10px] text-white/40 group-hover/main-preview:text-white/80 font-mono flex items-center gap-1 shrink-0 ml-2 transition-colors">
+                                  View Original <ExternalLink size={10} />
+                                </span>
+                              </div>
+                            </a>
+
+                            {/* If multiple certificates exist, list thumbnail switcher */}
+                            {certs.length > 1 && (
+                              <div className="pt-2 space-y-1.5">
+                                <p className="text-[10px] uppercase tracking-wider text-white/40 font-semibold">
+                                  All Attached Credentials ({certs.length}) — Click to preview:
+                                </p>
+                                <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1 custom-scrollbar">
+                                  {certs.map((cert, idx) => {
+                                    const isCertActive = idx === activeIndex;
+                                    const thumbImg = getCertificatePreviewImage(cert);
+
+                                    return (
+                                      <button
+                                        type="button"
+                                        key={idx}
+                                        onClick={() => setActiveCertIndex(idx)}
+                                        className={`w-full group/thumb flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer text-left ${
+                                          isCertActive
+                                            ? 'bg-white/[0.12] border-white/30 text-white ring-1 ring-white/20'
+                                            : 'bg-white/[0.03] border-white/[0.07] text-white/70 hover:bg-white/[0.07] hover:border-white/20 hover:text-white'
+                                        }`}
+                                      >
+                                        <div className="shrink-0 w-8 h-8 rounded border border-white/10 overflow-hidden bg-black/60 flex items-center justify-center">
+                                          <img
+                                            src={thumbImg}
+                                            alt={cert.name}
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                          />
+                                        </div>
+                                        <span className="text-xs font-medium truncate flex-1">
+                                          {cert.name}
+                                        </span>
+                                        <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-white/40 shrink-0">
+                                          {cert.type === 'image' ? 'IMG' : 'PDF'}
+                                        </span>
+                                        <a
+                                          href={cert.path}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="text-white/30 hover:text-white transition-colors p-1"
+                                          title="Open original document in new tab"
+                                        >
+                                          <ExternalLink size={12} />
+                                        </a>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Solid Matte Tag Badges */}
+                        <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-white/[0.08]">
+                          {selectedBadge.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className={`text-[10.5px] px-2.5 py-0.5 rounded-[3px] font-medium border text-center ${getTagStyle(tag)}`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    );
+                  })()}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
     </section>

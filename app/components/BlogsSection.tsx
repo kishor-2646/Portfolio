@@ -37,7 +37,7 @@ export default function BlogsSection() {
   return (
     <section
       id="blogs"
-      className="relative w-full py-36 sm:py-48 bg-black text-white overflow-hidden border-t border-white/5"
+      className="relative w-full py-52 sm:py-72 lg:py-80 bg-black text-white overflow-hidden border-t border-white/5"
     >
       <div className="w-[96%] max-w-6xl mx-auto px-4 sm:px-6">
         

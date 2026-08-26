@@ -446,7 +446,7 @@ export default function JourneySection() {
     <section
       id="journey"
       ref={containerRef}
-      className="relative w-full text-white bg-black overflow-visible"
+      className="relative w-full text-white bg-black overflow-visible border-t border-white/5"
       style={{
         height: '480vh',
       }}
@@ -671,7 +671,7 @@ export default function JourneySection() {
       </div>
 
       {/* ── MOBILE FALLBACK: Clean Vertical Timeline ── */}
-      <div className="block md:hidden px-6 py-20">
+      <div className="block md:hidden px-6 py-44 sm:py-56">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold tracking-[0.25em] text-white uppercase mb-2">
             EXPERIENCE
