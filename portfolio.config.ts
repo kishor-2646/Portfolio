@@ -465,6 +465,24 @@ const portfolioConfig = {
       highlight: "Completed intensive track on autonomous agent architectures and tool-calling LLM integrations.",
       tags: ["Kaggle", "AI Agents", "Tool Calling", "Python"],
     },
+    {
+      id: "agentic-ai-saksham",
+      title: "Agentic AI Saksham Program",
+      event: "Capabl × Sri Sairam College of Engineering",
+      year: "2026",
+      category: "Workshop",
+      highlight: "Completed 2-day Agentic AI program on autonomous agent architectures — recognised by MSME, Startup India, and incubated by nasscom.",
+      tags: ["Agentic AI", "nasscom", "MSME", "AI Agents"],
+    },
+    {
+      id: "cisco-networking-basics",
+      title: "Cisco Networking Basics Certified",
+      event: "Cisco Networking Academy",
+      year: "2026",
+      category: "Certification",
+      highlight: "Certified in networking fundamentals, protocols, IP addressing, and network communications with 6 verified module achievements.",
+      tags: ["Cisco", "Networking", "Protocols", "Certified"],
+    },
   ],
 
 

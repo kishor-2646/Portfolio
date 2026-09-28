@@ -375,6 +375,38 @@ const BADGES_LIST: BadgeItem[] = [
       { name: 'SkillRack Profile', path: '/Achievements/Certificates/Skillrack/Screenshot_20250825-112812.Chrome.png', type: 'image' },
     ],
   },
+
+  // ═══════════════════ LATEST ACHIEVEMENTS (2026) ═══════════════════
+  {
+    id: 'agentic-ai-saksham',
+    title: 'Agentic AI Saksham Program',
+    issuer: 'Capabl × Sri Sairam College of Engineering',
+    year: '2026',
+    category: 'Workshop',
+    badgeStyle: 'tech-hex',
+    logoType: 'badge-svg',
+    highlight: 'Completed the 2-day Agentic AI Saksham Program on autonomous AI agent architectures and agentic workflows — recognised by MSME, Startup India, accredited by ISO 9001:2015, and incubated by nasscom.',
+    tags: ['Agentic AI', 'nasscom', 'MSME', 'Startup India', 'AI Agents'],
+    certificates: [
+      { name: 'Agentic AI Saksham Certificate', path: '/Achievements/Certificates/Agentic AI Saksham/Agent AI Certificate.jpeg', type: 'image' },
+      { name: 'Agentic AI Saksham Photo', path: '/Achievements/Certificates/Agentic AI Saksham/Agentic AI Photo.jpeg', type: 'image' },
+
+    ],
+  },
+  {
+    id: 'cisco-networking-basics',
+    title: 'Cisco Networking Basics Certified',
+    issuer: 'Cisco Networking Academy',
+    year: '2026',
+    category: 'Certification',
+    badgeStyle: 'agency-banner',
+    logoType: 'badge-svg',
+    highlight: 'Certified by Cisco Networking Academy in Networking Basics — covering network protocols, IP addressing, network access, and communications fundamentals with 6 verified module achievements.',
+    tags: ['Cisco', 'Networking', 'Protocols', 'IP Addressing', 'Certified'],
+    certificates: [
+      { name: 'Networking Basics Certificate', path: '/Achievements/Certificates/Cisco/Cisco Network Certificate.jpeg', type: 'image' },
+    ],
+  },
 ];
 
 /* ─────────────────────────────────────────────────────────────
@@ -383,10 +415,10 @@ const BADGES_LIST: BadgeItem[] = [
 function getTagStyle(tag: string): string {
   const t = tag.toLowerCase().trim();
 
-  if (t.includes('flutter'))   return 'bg-[#152a3a] text-[#8ec8f6] border-[#22445e]';
-  if (t.includes('firebase'))  return 'bg-[#302315] text-[#f2ad55] border-[#4c3620]';
+  if (t.includes('flutter')) return 'bg-[#152a3a] text-[#8ec8f6] border-[#22445e]';
+  if (t.includes('firebase')) return 'bg-[#302315] text-[#f2ad55] border-[#4c3620]';
   if (t.includes('google') || t.includes('kaggle')) return 'bg-[#182a32] text-[#71c3d9] border-[#284654]';
-  if (t.includes('microsoft') || t.includes('ey'))  return 'bg-[#1c2438] text-[#93abde] border-[#2e3b5a]';
+  if (t.includes('microsoft') || t.includes('ey')) return 'bg-[#1c2438] text-[#93abde] border-[#2e3b5a]';
   if (t.includes('mongodb') || t.includes('nosql') || t.includes('database')) return 'bg-[#152e22] text-[#63e2a2] border-[#214936]';
   if (t.includes('ai') || t.includes('agent') || t.includes('ml') || t.includes('llm')) return 'bg-[#291b36] text-[#c086fc] border-[#422b57]';
   if (t.includes('sdg') || t.includes('social')) return 'bg-[#321c1f] text-[#fca5a5] border-[#502c32]';
@@ -403,6 +435,8 @@ function getTagStyle(tag: string): string {
   if (t.includes('automation') || t.includes('n8n') || t.includes('low-code')) return 'bg-[#2a1e2e] text-[#c490d4] border-[#42304a]';
   if (t.includes('web') || t.includes('poster')) return 'bg-[#1c2c38] text-[#83b8d8] border-[#2c4458]';
   if (t.includes('genai') || t.includes('prompt')) return 'bg-[#2a1a34] text-[#c490e8] border-[#42294e]';
+  if (t.includes('cisco') || t.includes('networking') || t.includes('protocol') || t.includes('ip address')) return 'bg-[#132c2e] text-[#5ed4b8] border-[#1e4a48]';
+  if (t.includes('nasscom') || t.includes('msme') || t.includes('startup india') || t.includes('certified')) return 'bg-[#1a2040] text-[#9aa8e8] border-[#2c3468]';
 
   return 'bg-[#192433] text-[#86aed6] border-[#2a3c54]';
 }
@@ -418,10 +452,10 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#4285F4]/30 bg-gradient-to-b from-[#4285F4]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#4285F4]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">GOOGLE</span>
           <svg viewBox="0 0 48 48" className="w-12 h-12 drop-shadow-[0_4px_12px_rgba(66,133,244,0.4)]">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
           </svg>
           <span className="text-[9px] font-mono text-[#4285F4] font-semibold">AI Certified</span>
         </div>
@@ -436,10 +470,10 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#00A4EF]/30 bg-gradient-to-b from-[#00A4EF]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#00A4EF]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">MICROSOFT</span>
           <svg viewBox="0 0 48 48" className="w-11 h-11 drop-shadow-[0_4px_12px_rgba(0,164,239,0.3)]">
-            <rect x="2" y="2" width="20" height="20" fill="#F25022" rx="1"/>
-            <rect x="26" y="2" width="20" height="20" fill="#7FBA00" rx="1"/>
-            <rect x="2" y="26" width="20" height="20" fill="#00A4EF" rx="1"/>
-            <rect x="26" y="26" width="20" height="20" fill="#FFB900" rx="1"/>
+            <rect x="2" y="2" width="20" height="20" fill="#F25022" rx="1" />
+            <rect x="26" y="2" width="20" height="20" fill="#7FBA00" rx="1" />
+            <rect x="2" y="26" width="20" height="20" fill="#00A4EF" rx="1" />
+            <rect x="26" y="26" width="20" height="20" fill="#FFB900" rx="1" />
           </svg>
           <span className="text-[9px] font-mono text-[#00A4EF] font-semibold">AI Passport</span>
         </div>
@@ -454,9 +488,9 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#00ED64]/30 bg-gradient-to-b from-[#00ED64]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#00ED64]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">MONGODB</span>
           <svg viewBox="0 0 48 48" className="w-11 h-11 drop-shadow-[0_4px_14px_rgba(0,237,100,0.4)]">
-            <path fill="#00ED64" d="M23.5 1.5C23 3 13 14 13 25.5c0 6.35 4.5 12.5 10.5 14.5 1.5.5 1.5 5 1.5 6.5 0-1.5 0-6 1.5-6.5 6-2 10.5-8.15 10.5-14.5 0-11.5-10-22.5-10.5-24-1 2-2 1-3 0z"/>
-            <path fill="#00684A" d="M23.5 1.5v38.5c-6-2-10.5-8.15-10.5-14.5 0-11.5 10-22.5 10.5-24z"/>
-            <path fill="#023430" d="M23.5 40v6.5c-1 0-1.2-4.5-1.2-6.5h1.2z"/>
+            <path fill="#00ED64" d="M23.5 1.5C23 3 13 14 13 25.5c0 6.35 4.5 12.5 10.5 14.5 1.5.5 1.5 5 1.5 6.5 0-1.5 0-6 1.5-6.5 6-2 10.5-8.15 10.5-14.5 0-11.5-10-22.5-10.5-24-1 2-2 1-3 0z" />
+            <path fill="#00684A" d="M23.5 1.5v38.5c-6-2-10.5-8.15-10.5-14.5 0-11.5 10-22.5 10.5-24z" />
+            <path fill="#023430" d="M23.5 40v6.5c-1 0-1.2-4.5-1.2-6.5h1.2z" />
           </svg>
           <span className="text-[9px] font-mono text-[#00ED64] font-semibold">12 Courses</span>
         </div>
@@ -507,8 +541,8 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#FF9900]/30 bg-gradient-to-b from-[#FF9900]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#FF9900]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">AMAZON</span>
           <svg viewBox="0 0 54 36" className="w-14 h-9 drop-shadow-[0_4px_12px_rgba(255,153,0,0.4)] my-auto">
-            <path fill="#FF9900" d="M12 25c7 5 22 5 29 0 1-.7.2-1.5-.7-1-6.5 3.5-19.5 3.5-26 0-.8-.5-1.5.3-.8 1z"/>
-            <path fill="#FF9900" d="M43 23.5c-.8-.2-2.5-.2-3.8.3-.3.1-.2.4.1.4 1.8.2 3.8.8 4.2 1 .3.2.5 0 .4-.3-.3-.4-.5-1.1-.9-1.4z"/>
+            <path fill="#FF9900" d="M12 25c7 5 22 5 29 0 1-.7.2-1.5-.7-1-6.5 3.5-19.5 3.5-26 0-.8-.5-1.5.3-.8 1z" />
+            <path fill="#FF9900" d="M43 23.5c-.8-.2-2.5-.2-3.8.3-.3.1-.2.4.1.4 1.8.2 3.8.8 4.2 1 .3.2.5 0 .4-.3-.3-.4-.5-1.1-.9-1.4z" />
             <text x="27" y="15" textAnchor="middle" fill="#FFFFFF" fontSize="13" fontWeight="900" fontFamily="sans-serif">aws</text>
           </svg>
           <span className="text-[9px] font-mono text-[#FF9900] font-semibold">Cloud Compute</span>
@@ -524,7 +558,7 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#20BEFF]/30 bg-gradient-to-b from-[#20BEFF]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#20BEFF]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">KAGGLE × GOOGLE</span>
           <svg viewBox="0 0 40 40" className="w-10 h-10 drop-shadow-[0_4px_12px_rgba(32,190,255,0.4)] my-auto">
-            <path fill="#20BEFF" d="M8 4v32h6V22.5l11 13.5h7.5L19.5 20 31.5 4h-7.5L14 16V4H8z"/>
+            <path fill="#20BEFF" d="M8 4v32h6V22.5l11 13.5h7.5L19.5 20 31.5 4h-7.5L14 16V4H8z" />
           </svg>
           <span className="text-[9px] font-mono text-[#20BEFF] font-semibold">AI Agents</span>
         </div>
@@ -539,10 +573,10 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#EA4B71]/30 bg-gradient-to-b from-[#EA4B71]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#EA4B71]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">N8N</span>
           <svg viewBox="0 0 48 32" className="w-12 h-8 drop-shadow-[0_4px_12px_rgba(234,75,113,0.4)] my-auto">
-            <rect x="2" y="10" width="12" height="12" rx="3" fill="#EA4B71"/>
-            <rect x="18" y="4" width="12" height="12" rx="3" fill="#FF6D5A"/>
-            <rect x="34" y="10" width="12" height="12" rx="3" fill="#EA4B71"/>
-            <path d="M14 16 L18 10 M30 10 L34 16" stroke="#FF6D5A" strokeWidth="2.5" strokeLinecap="round"/>
+            <rect x="2" y="10" width="12" height="12" rx="3" fill="#EA4B71" />
+            <rect x="18" y="4" width="12" height="12" rx="3" fill="#FF6D5A" />
+            <rect x="34" y="10" width="12" height="12" rx="3" fill="#EA4B71" />
+            <path d="M14 16 L18 10 M30 10 L34 16" stroke="#FF6D5A" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
           <span className="text-[9px] font-mono text-[#EA4B71] font-semibold">Automation</span>
         </div>
@@ -557,8 +591,8 @@ function BadgeGraphic({ badge }: { badge: BadgeItem }) {
         <div className="w-full h-full rounded-2xl border border-[#f97316]/30 bg-gradient-to-b from-[#f97316]/10 via-black/40 to-black/80 backdrop-blur-xl p-3 shadow-[0_12px_28px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between group-hover:border-[#f97316]/60 transition-all duration-300">
           <span className="text-[9px] font-bold text-white/50 tracking-wider uppercase">SKILLRACK</span>
           <svg viewBox="0 0 48 48" className="w-10 h-10 drop-shadow-[0_4px_12px_rgba(249,115,22,0.4)] my-auto">
-            <rect x="4" y="4" width="40" height="40" rx="8" fill="#1e293b" stroke="#f97316" strokeWidth="2"/>
-            <path d="M16 16 L10 24 L16 32 M32 16 L38 24 L32 32 M26 12 L22 36" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="4" y="4" width="40" height="40" rx="8" fill="#1e293b" stroke="#f97316" strokeWidth="2" />
+            <path d="M16 16 L10 24 L16 32 M32 16 L38 24 L32 32 M26 12 L22 36" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="text-[9px] font-mono text-[#f97316] font-semibold">Competitive DSA</span>
         </div>
@@ -956,11 +990,10 @@ export default function AchievementsSection() {
                                         type="button"
                                         key={idx}
                                         onClick={() => setActiveCertIndex(idx)}
-                                        className={`w-full group/thumb flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer text-left ${
-                                          isCertActive
-                                            ? 'bg-white/[0.12] border-white/30 text-white ring-1 ring-white/20'
-                                            : 'bg-white/[0.03] border-white/[0.07] text-white/70 hover:bg-white/[0.07] hover:border-white/20 hover:text-white'
-                                        }`}
+                                        className={`w-full group/thumb flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer text-left ${isCertActive
+                                          ? 'bg-white/[0.12] border-white/30 text-white ring-1 ring-white/20'
+                                          : 'bg-white/[0.03] border-white/[0.07] text-white/70 hover:bg-white/[0.07] hover:border-white/20 hover:text-white'
+                                          }`}
                                       >
                                         <div className="shrink-0 w-8 h-8 rounded border border-white/10 overflow-hidden bg-black/60 flex items-center justify-center">
                                           <img
