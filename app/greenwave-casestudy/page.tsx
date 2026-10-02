@@ -86,7 +86,7 @@ const SectionBadge = ({ icon: Icon, color, number, title }: {
    ═══════════════════════════════════════════════════════════════ */
 export default function GreenWaveCaseStudy() {
   return (
-    <div className="min-h-screen text-white/70 font-[var(--font-outfit,'Outfit'),system-ui,sans-serif] selection:bg-emerald-500/20 selection:text-white" style={{ background: '#000' }}>
+    <div className="min-h-screen text-white/70 font-[var(--font-outfit,'Outfit'),system-ui,sans-serif] selection:bg-emerald-500/20 selection:text-white scroll-smooth" style={{ background: '#000' }} role="main" aria-label="GreenWave Engineering Case Study">
 
       {/* ── BACK NAV ──────────────────────────────────────────── */}
       <motion.nav
@@ -94,6 +94,7 @@ export default function GreenWaveCaseStudy() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
         className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06]"
+        aria-label="Case study navigation"
         style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       >
         <div className="max-w-5xl mx-auto px-6 py-3.5 flex items-center justify-between">
