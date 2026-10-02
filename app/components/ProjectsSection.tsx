@@ -221,6 +221,19 @@ function StackCard({
                   <span>Code</span>
                 </a>
               ) : null}
+
+              {/* Engineering Blog button — GreenWave only */}
+              {project.slug === 'greenwave' && (
+                <a
+                  href="/greenwave-casestudy"
+                  onClick={e => e.stopPropagation()}
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13.5px] font-medium px-5 py-2 rounded-full transition-all text-emerald-400/90 border border-emerald-500/25 hover:border-emerald-400/50 hover:text-emerald-300 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.12] active:scale-95"
+                  title="Read Engineering Blog"
+                >
+                  <Sparkles size={14} />
+                  <span>Engineering Blog</span>
+                </a>
+              )}
             </div>
 
           </div>
