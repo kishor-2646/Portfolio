@@ -712,12 +712,18 @@ and no embedded datasource could be configured.`}
       </main>
 
       {/* ── FOOTER ────────────────────────────────────────────── */}
-      <footer className="border-t border-white/[0.06] py-8">
+      <footer className="border-t border-white/[0.06] py-8" role="contentinfo">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between text-xs text-white/20">
           <span>© {new Date().getFullYear()} Kishor Kumar S</span>
-          <Link href="/" className="hover:text-white/50 transition-colors duration-300">
-            ← Back to Portfolio
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/project/greenwave" className="hover:text-white/50 transition-colors duration-300">
+              Original Case Study
+            </Link>
+            <span className="text-white/10">·</span>
+            <Link href="/" className="hover:text-white/50 transition-colors duration-300">
+              ← Back to Portfolio
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
