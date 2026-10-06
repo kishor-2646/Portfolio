@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { ExternalLink, Github, ArrowUpRight, Sparkles } from 'lucide-react';
-import { PROJECTS } from '../lib/data';
+import { PROJECTS, FUN_PROJECTS } from '../lib/data';
 import { ease, dur } from '../lib/motion';
 import { useScrollDirection } from '../lib/useScrollDirection';
 import AnimatedSectionHeader from './AnimatedSectionHeader';
@@ -367,73 +367,79 @@ export default function ProjectsSection() {
           </motion.p>
         </div>
 
-        {/* 2-Card Grid with Staggered Entrance */}
+        {/* Project Cards — data-driven from portfolio.config.ts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          
-          {/* Card 1: Cargo Flow */}
-          <motion.div
-            initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
-            viewport={{ once: false, amount: 0.15 }}
-            transition={{ duration: 0.65, delay: 0.1, ease: ease.out }}
-            whileHover={{ y: -4 }}
-            className="group cursor-pointer flex flex-col justify-between"
-          >
-            <div>
-              <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
-                <img
-                  src="/projects/greenwave.png"
-                  alt="Cargo Flow"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
-                Cargo Flow
-              </h4>
-              <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
-                An AI driven Cargo web app to manage shipments and communication
-              </p>
-            </div>
-            <div className="mt-4">
-              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all active:scale-95">
-                View case study
-              </button>
-            </div>
-          </motion.div>
+          {FUN_PROJECTS.map((project: any, i: number) => (
+            <motion.div
+              key={project.title}
+              initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
+              viewport={{ once: false, amount: 0.15 }}
+              transition={{ duration: 0.65, delay: 0.1 + i * 0.12, ease: ease.out }}
+              whileHover={{ y: -4 }}
+              className="group flex flex-col justify-between"
+            >
+              <div>
+                {/* Project Image / Placeholder */}
+                <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
+                  {project.image ? (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    /* Gradient placeholder for projects without a screenshot */
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">
+                      <div className="text-center space-y-2 p-6">
+                        <div className="w-14 h-14 mx-auto rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                          <Github size={24} className="text-white/40" />
+                        </div>
+                        <p className="text-xs text-white/25 font-mono">Preview not available</p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Tags overlay at bottom-left */}
+                  {project.tags && project.tags.length > 0 && (
+                    <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+                      {project.tags.slice(0, 3).map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/15 text-[10px] font-medium text-white/70"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-          {/* Card 2: PCify Learning */}
-          <motion.div
-            initial={{ opacity: 0, y: scrollDirection === 'down' ? 24 : -24, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1.0 }}
-            viewport={{ once: false, amount: 0.15 }}
-            transition={{ duration: 0.65, delay: 0.22, ease: ease.out }}
-            whileHover={{ y: -4 }}
-            className="group cursor-pointer flex flex-col justify-between"
-          >
-            <div>
-              <div className="relative w-full aspect-[16/10] rounded-2xl sm:rounded-[22px] overflow-hidden bg-zinc-950 border border-white/10 shadow-2xl">
-                <img
-                  src="/projects/pcify.png"
-                  alt="PCify Architecture"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  loading="lazy"
-                />
+                <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
+                  {project.title}
+                </h4>
+                <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
+                  {project.description}
+                </p>
               </div>
-              <h4 className="text-xl sm:text-2xl font-semibold text-white mt-5 tracking-tight group-hover:text-white transition-colors">
-                PCify Architecture Lab
-              </h4>
-              <p className="text-sm sm:text-[15px] text-white/60 mt-1.5 leading-relaxed">
-                Experimental AI component compatibility engine and automated benchmark evaluator
-              </p>
-            </div>
-            <div className="mt-4">
-              <button className="inline-flex items-center text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white transition-all active:scale-95">
-                View case study
-              </button>
-            </div>
-          </motion.div>
 
+              {/* GitHub CTA */}
+              {project.github && (
+                <div className="mt-4">
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium px-5 py-2 rounded-full border border-white/20 text-white/80 bg-white/5 hover:border-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-95"
+                  >
+                    <Github size={14} />
+                    {project.btnLabel || 'View repository'}
+                    <ArrowUpRight size={13} className="opacity-60 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </div>
+              )}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

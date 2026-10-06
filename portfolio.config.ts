@@ -314,19 +314,24 @@ const portfolioConfig = {
     },
   ],
 
-  /** 2 Cards displayed under "Fun and Learning Projects" */
+  /** Cards displayed under "Fun and Learning Projects".
+   *  `image` is optional — leave it empty to show the standard placeholder. */
   funProjects: [
     {
-      title: "Cargo Flow",
-      description: "An AI driven Cargo web app to manage shipments and communication.",
-      image: "/projects/greenwave.png",
-      btnLabel: "View case study",
+      title: "Agentic AI — Local LLM Agents",
+      description: "Two LangChain agents running fully offline on Ollama (Qwen3): a resume-aware Career Match agent with live job search, and a Personal Investment Research agent combining RAG with live stock data.",
+      tags: ["LangChain", "Ollama", "RAG · FAISS", "Gradio"],
+      image: "/projects/agentic-ai-placeholder.jpg",
+      github: "https://github.com/kishor-2646/Agentic-Ai",
+      btnLabel: "View repository",
     },
     {
-      title: "PCify Architecture Lab",
-      description: "Experimental AI component compatibility engine and automated benchmark evaluator.",
-      image: "/projects/PCify.png",
-      btnLabel: "View case study",
+      title: "AQI Prediction System",
+      description: "End-to-end ML pipeline that predicts Air Quality Index from pollution and weather data — preprocessing, model comparison, and a Flask web app for live predictions.",
+      tags: ["Python", "Scikit-learn", "Flask", "Jupyter"],
+      image: "/projects/aqi-dashboard.png",
+      github: "https://github.com/kishor-2646/AQI-Project",
+      btnLabel: "View repository",
     },
   ],
 
@@ -493,25 +498,35 @@ const portfolioConfig = {
     heading: "Blogs & Study Notes",
     subtitle: "Deep dives, cheat sheets, architecture blueprints, and lessons learned from the trenches.",
 
+    // ── RESOURCE LINKS ──────────────────────────────────────────────────────
+    // Every blog item accepts an optional `href`.
+    //   • Internal page  → "/greenwave-casestudy"
+    //   • External link  → "https://github.com/..."
+    //   • Empty / absent → card is greyed out as "Resource not added yet"
+    // ────────────────────────────────────────────────────────────────────────
+
     // Left Column Featured Article
     featuredArticle: {
-      tag: "Architecture Deep Dive",
+      tag: "Engineering Blog",
       readTime: "8 min read",
-      title: "Building Real-Time Systems with Firebase & Flutter",
-      description: "How I built GreenWave's sub-second GPS tracking system — architecture decisions, websocket pitfalls, and lessons learned under hackathon pressure.",
+      title: "GreenWave — Building a Real-Time Ambulance Green Corridor",
+      description: "How I built GreenWave's sub-second GPS tracking and signal automation — architecture decisions, websocket pitfalls, and lessons learned under hackathon pressure.",
+      href: "/greenwave-casestudy",
     },
 
     // Left Column Notes
     compactNotes: [
       {
-        title: "DSA Cheat Sheet — Trees & Graphs",
-        description: "Reference notes for BFS/DFS traversals, topological sort, and DP recursion patterns.",
-        category: "DSA Reference",
+        title: "DSA Journey — Striver's A2Z in Java",
+        description: "100+ problems solved across basics, arrays & binary search — clean Java solutions with intuitive notes and diagrams.",
+        category: "DSA Prep",
+        href: "https://github.com/kishor-2646/DSA-Journey",
       },
       {
-        title: "Flutter Architecture: Riverpod vs Bloc",
-        description: "Comparing async state management performance across high-frequency GPS stream updates.",
-        category: "State Management",
+        title: "Java Learning Notes",
+        description: "Handwritten notebook pages converted to markdown summaries, with hands-on practice code organised topic by topic.",
+        category: "Java Prep",
+        href: "https://github.com/kishor-2646/JAVA-Learning-Notes",
       },
     ],
 
@@ -536,6 +551,7 @@ const portfolioConfig = {
         "> FIX: autoDispose + debounce",
       ],
       readTime: "5 min read",
+      href: "",
     },
 
     // Right Column Quick Rules
@@ -550,19 +566,28 @@ const portfolioConfig = {
       title: "API Protocols: REST vs gRPC & WebSockets",
       description: "Serialization overhead, payload benchmarks, and event-stream latency for real-time mobile apps.",
       category: "Network & Systems",
+      href: "",
     },
 
-    // Bottom Wide Cards
+    // Bottom Wide Cards (2 or 3 per row is auto-balanced)
     bottomCards: [
+      {
+        category: "State Management",
+        title: "Flutter Architecture: Riverpod vs Bloc",
+        description: "Async state management performance across high-frequency GPS stream updates.",
+        href: "",
+      },
       {
         category: "System Design",
         title: "Designing Fault-Tolerant IoT Pipelines",
         description: "Handling network disconnects, offline queuing, and backpressure.",
+        href: "",
       },
       {
         category: "Hackathon Playbook",
         title: "How to Win 24-Hour Hackathons",
         description: "Team leadership, ruthless scoping, MVP prioritization, and winning pitch decks.",
+        href: "",
       },
     ],
   },
